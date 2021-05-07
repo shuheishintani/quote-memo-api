@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
 
 	"firebase.google.com/go/v4/auth"
 	"github.com/gin-contrib/cors"
@@ -16,22 +18,30 @@ import (
 
 func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 	r := gin.Default()
-
-	r.Use(cors.Default())
-	r.Use(func(c *gin.Context) {
-		c.Set("auth", auth)
-	})
-	r.Use(middleware.AuthMiddleware())
-
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{os.Getenv("CLIENT_ORIGIN")},
+		AllowMethods:     []string{"GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 	service := services.NewService(db)
 	controller := controllers.NewController(service)
 
-	api := r.Group("/api")
+	public := r.Group("/api")
+	public.GET("/books", controller.GetBooks)
+	public.GET("/tags", controller.GetTags)
 
-	api.GET("/books", controller.GetBooks)
-	api.GET("/tags", controller.GetTags)
-	api.GET("/quotes", controller.GetQuotes)
-	api.POST("/quotes", controller.PostQuote)
+	private := r.Group("/api")
+
+	private.Use(func(c *gin.Context) {
+		c.Set("auth", auth)
+	})
+	private.Use(middleware.AuthMiddleware())
+
+	private.GET("/quotes", controller.GetQuotes)
+	private.POST("/quotes", controller.PostQuote)
 
 	return r
 }

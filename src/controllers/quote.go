@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -20,8 +21,8 @@ func NewController(service *services.Service) *Controller {
 }
 
 func (ctl *Controller) GetQuotes(c *gin.Context) {
-	uid := c.MustGet("uid").(string)
-	println(uid)
+	// uid := c.MustGet("uid").(string)
+	// println(uid)
 	strTags := c.Query("tags")
 	var tagNames []string
 	if strTags != "" {
@@ -39,6 +40,8 @@ func (ctl *Controller) PostQuote(c *gin.Context) {
 	if err := c.BindJSON(&postQuoteInput); err != nil {
 		c.String(http.StatusBadRequest, "Request is failed: "+err.Error())
 	}
+
+	fmt.Println(postQuoteInput)
 
 	quote, err := ctl.service.PostQuote(postQuoteInput)
 	if err != nil {
