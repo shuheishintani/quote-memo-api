@@ -23,7 +23,11 @@ func GormConnect() (*gorm.DB, error) {
 	if err != nil {
 		return db, err
 	}
-	db.AutoMigrate(&models.Quote{}, &models.Tag{})
+	// db.Migrator().DropTable(&models.Quote{})
+	// db.Migrator().DropTable(&models.Book{})
+	// db.Migrator().DropTable(&models.Tag{})
+	// db.Migrator().DropTable("quote_tags")
+	db.AutoMigrate(&models.Quote{}, &models.Book{}, &models.Tag{})
 
 	return db, nil
 }

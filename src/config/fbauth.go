@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"log"
 	"path/filepath"
 
 	firebase "firebase.google.com/go/v4"
@@ -12,7 +13,7 @@ import (
 func InitAuth() (*auth.Client, error) {
 	serviceAccountKeyFilePath, err := filepath.Abs("./serviceAccountKey.json")
 	if err != nil {
-		panic("Unable to load serviceAccountKeys.json file")
+		log.Fatal("Unable to load serviceAccountKeys.json file")
 	}
 
 	opt := option.WithCredentialsFile(serviceAccountKeyFilePath)

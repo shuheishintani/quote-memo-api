@@ -1,29 +1,15 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/shuheishintani/quote-manager-api/src/dto"
 	"github.com/shuheishintani/quote-manager-api/src/models"
-	"gorm.io/gorm"
 )
 
-type Service struct {
-	db *gorm.DB
-}
-
-func NewService(db *gorm.DB) *Service {
-	return &Service{
-		db: db,
-	}
-}
-
-func (service *Service) GetQuotes(tagNames []string) ([]models.Quote, error) {
-	fmt.Println(tagNames)
+func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]models.Quote, error) {
 	quotes := []models.Quote{}
 
 	if len(tagNames) == 0 {
-		if result := service.db.Preload("Tags").Find(&quotes); result.Error != nil {
+		if result := service.db.Preload("Book").Preload("Tags").Where("UID = ?", uid).Find(&quotes); result.Error != nil {
 			return []models.Quote{}, result.Error
 		}
 		return quotes, nil
@@ -42,20 +28,32 @@ func (service *Service) GetQuotes(tagNames []string) ([]models.Quote, error) {
 			subQuery,
 			len(tagNames),
 		).
+		Where("UID = ?", uid).
 		Find(&quotes); result.Error != nil {
 		return []models.Quote{}, result.Error
 	}
-
 	return quotes, nil
 }
 
-func (service *Service) PostQuote(postQuoteInput dto.PostQuoteInput) (models.Quote, error) {
-	quote := models.Quote{
-		Text: postQuoteInput.Text,
-		Page: postQuoteInput.Page,
-		ISBN: postQuoteInput.ISBN,
+func (service *Service) PostQuote(postQuoteInput dto.PostQuoteInput, uid string) (models.Quote, error) {
+	book := models.Book{
+		Isbn:          postQuoteInput.Book.Isbn,
+		Title:         postQuoteInput.Book.Title,
+		Author:        postQuoteInput.Book.Author,
+		Publisher:     postQuoteInput.Book.Publisher,
+		CoverImageUrl: postQuoteInput.Book.CoverImageUrl,
+	}
+	if result := service.db.FirstOrCreate(&book); result.Error != nil {
+		return models.Quote{}, result.Error
 	}
 
+	quote := models.Quote{
+		Text:   postQuoteInput.Text,
+		Page:   postQuoteInput.Page,
+		ISBN:   postQuoteInput.Book.Isbn,
+		BookID: book.ID,
+		UID:    uid,
+	}
 	if result := service.db.Save(&quote); result.Error != nil {
 		return models.Quote{}, result.Error
 	}
@@ -64,7 +62,6 @@ func (service *Service) PostQuote(postQuoteInput dto.PostQuoteInput) (models.Quo
 		registeredTag := models.Tag{}
 		if result := service.db.FirstOrCreate(&registeredTag, tag); result.Error != nil {
 			return models.Quote{}, result.Error
-
 		}
 		if err := service.db.Model(&quote).Association("Tags").Append(&registeredTag); err != nil {
 			return models.Quote{}, err

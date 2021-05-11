@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -21,11 +21,12 @@ func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{os.Getenv("CLIENT_ORIGIN")},
 		AllowMethods:     []string{"GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Authorization"},
+		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+
 	service := services.NewService(db)
 	controller := controllers.NewController(service)
 
@@ -34,13 +35,11 @@ func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 	public.GET("/tags", controller.GetTags)
 
 	private := r.Group("/api")
-
 	private.Use(func(c *gin.Context) {
 		c.Set("auth", auth)
 	})
 	private.Use(middleware.AuthMiddleware())
-
-	private.GET("/quotes", controller.GetQuotes)
+	private.GET("/quotes", controller.GetPrivateQuotes)
 	private.POST("/quotes", controller.PostQuote)
 
 	return r
@@ -49,17 +48,17 @@ func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		fmt.Println("Error loading .env file", err)
+		log.Fatal("Error loading .env file", err)
 	}
 
 	db, err := config.GormConnect()
 	if err != nil {
-		fmt.Println("Failed to connect database: ", err)
+		log.Fatal("Failed to connect database: ", err)
 	}
 
 	auth, err := config.InitAuth()
 	if err != nil {
-		fmt.Println("Failed to init firebase auth: ", err)
+		log.Fatal("Failed to init firebase auth: ", err)
 	}
 
 	r := setRouter(db, auth)

@@ -15,14 +15,14 @@ func AuthMiddleware() gin.HandlerFunc {
 		authorizationToken := c.GetHeader("Authorization")
 		idToken := strings.TrimSpace(strings.Replace(authorizationToken, "Bearer", "", 1))
 		if idToken == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Id token not available"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "Id token is not available"})
 			c.Abort()
 			return
 		}
 
 		token, err := auth.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid token"})
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			c.Abort()
 			return
 		}
