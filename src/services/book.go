@@ -9,8 +9,15 @@ import (
 	"os"
 
 	"github.com/shuheishintani/quote-manager-api/src/dto"
-	"github.com/shuheishintani/quote-manager-api/src/models"
 )
+
+type Book struct {
+	Isbn          string `json:"isbn"`
+	Title         string `json:"title"`
+	Author        string `json:"author"`
+	Publisher     string `json:"publisher"`
+	CoverImageUrl string `json:"coverImageUrl"`
+}
 
 type ApiResponse struct {
 	Items []struct {
@@ -57,12 +64,12 @@ type ApiResponse struct {
 	First            int           `json:"first"`
 }
 
-func (service *Service) GetBooks(getBooksInput dto.GetBooksInput) ([]models.Book, error) {
+func (service *Service) GetBooks(getBooksInput dto.GetBooksInput) ([]Book, error) {
 	title := getBooksInput.Title
 	author := getBooksInput.Author
 	page := getBooksInput.Page
 
-	url := fmt.Sprintf("https://app.rakuten.co.jp/services/api/BooksBook/Search/20170404?format=json&applicationId=%s", os.Getenv("RAKUTEN_APP_ID"))
+	url := fmt.Sprintf("%s?format=json&applicationId=%s", os.Getenv("RAKUTEN_BOOK_API_URL"), os.Getenv("RAKUTEN_APP_ID"))
 	if title != "" && author != "" {
 		url += fmt.Sprintf("&title=%s&author=%s&page=%s", title, author, page)
 	} else if title != "" {
@@ -70,29 +77,29 @@ func (service *Service) GetBooks(getBooksInput dto.GetBooksInput) ([]models.Book
 	} else if author != "" {
 		url += fmt.Sprintf("&&author=%s&page=%s", author, page)
 	} else {
-		return []models.Book{}, errors.New("parameters is not valid")
+		return []Book{}, errors.New("parameters is not valid")
 	}
 
 	resp, err := http.Get(url)
 	if err != nil {
-		return []models.Book{}, err
+		return []Book{}, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return []models.Book{}, err
+		return []Book{}, err
 	}
 
 	var data ApiResponse
 	if err := json.Unmarshal(body, &data); err != nil {
-		return []models.Book{}, err
+		return []Book{}, err
 	}
 
-	books := []models.Book{}
+	books := []Book{}
 
 	for _, item := range data.Items {
-		book := models.Book{
+		book := Book{
 			Isbn:          item.Item.Isbn,
 			Title:         item.Item.Title,
 			Author:        item.Item.Author,
