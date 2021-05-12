@@ -11,14 +11,6 @@ import (
 	"github.com/shuheishintani/quote-manager-api/src/dto"
 )
 
-type Book struct {
-	Isbn          string `json:"isbn"`
-	Title         string `json:"title"`
-	Author        string `json:"author"`
-	Publisher     string `json:"publisher"`
-	CoverImageUrl string `json:"coverImageUrl"`
-}
-
 type ApiResponse struct {
 	Items []struct {
 		Item struct {
@@ -64,7 +56,7 @@ type ApiResponse struct {
 	First            int           `json:"first"`
 }
 
-func (service *Service) GetBooks(getBooksInput dto.GetBooksInput) ([]Book, error) {
+func (service *Service) GetBooks(getBooksInput dto.GetBooksInput) ([]dto.Book, error) {
 	title := getBooksInput.Title
 	author := getBooksInput.Author
 	page := getBooksInput.Page
@@ -77,29 +69,29 @@ func (service *Service) GetBooks(getBooksInput dto.GetBooksInput) ([]Book, error
 	} else if author != "" {
 		url += fmt.Sprintf("&&author=%s&page=%s", author, page)
 	} else {
-		return []Book{}, errors.New("parameters is not valid")
+		return []dto.Book{}, errors.New("parameters is not valid")
 	}
 
 	resp, err := http.Get(url)
 	if err != nil {
-		return []Book{}, err
+		return []dto.Book{}, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return []Book{}, err
+		return []dto.Book{}, err
 	}
 
 	var data ApiResponse
 	if err := json.Unmarshal(body, &data); err != nil {
-		return []Book{}, err
+		return []dto.Book{}, err
 	}
 
-	books := []Book{}
+	books := []dto.Book{}
 
 	for _, item := range data.Items {
-		book := Book{
+		book := dto.Book{
 			Isbn:          item.Item.Isbn,
 			Title:         item.Item.Title,
 			Author:        item.Item.Author,

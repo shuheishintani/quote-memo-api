@@ -10,7 +10,6 @@ import (
 
 func (ctl *Controller) GetPrivateQuotes(c *gin.Context) {
 	uid := c.GetString("uid")
-
 	strTags := c.Query("tags")
 	var tagNames []string
 	if strTags != "" {
@@ -27,7 +26,6 @@ func (ctl *Controller) GetPrivateQuotes(c *gin.Context) {
 
 func (ctl *Controller) PostQuote(c *gin.Context) {
 	uid := c.GetString("uid")
-
 	postQuoteInput := dto.PostQuoteInput{}
 	if err := c.BindJSON(&postQuoteInput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -40,4 +38,54 @@ func (ctl *Controller) PostQuote(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, quote)
+}
+
+func (ctl *Controller) UpdateQuote(c *gin.Context) {
+	uid := c.GetString("uid")
+	id := c.Param("id")
+
+	quote, err := ctl.service.GetQuoteById(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	if quote.UID != uid {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden action"})
+		return
+	}
+
+	updateQuoteInput := dto.UpdateQuoteInput{}
+	if err := c.BindJSON(&updateQuoteInput); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	result, err := ctl.service.UpdateQuote(updateQuoteInput, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
+func (ctl *Controller) DeleteQuote(c *gin.Context) {
+	uid := c.GetString("uid")
+	id := c.Param("id")
+
+	quote, err := ctl.service.GetQuoteById(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	if quote.UID != uid {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden action"})
+		return
+	}
+
+	result, err := ctl.service.DeleteQuote(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, result)
 }

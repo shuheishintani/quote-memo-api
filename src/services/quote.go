@@ -1,9 +1,19 @@
 package services
 
 import (
+	"strconv"
+
 	"github.com/shuheishintani/quote-manager-api/src/dto"
 	"github.com/shuheishintani/quote-manager-api/src/models"
 )
+
+func (s *Service) GetQuoteById(id string) (models.Quote, error) {
+	quote := models.Quote{}
+	if result := s.db.Preload("Book").Preload("Tags").First(&quote, id); result.Error != nil {
+		return models.Quote{}, result.Error
+	}
+	return quote, nil
+}
 
 func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]models.Quote, error) {
 	quotes := []models.Quote{}
@@ -37,7 +47,7 @@ func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]model
 
 func (service *Service) PostQuote(postQuoteInput dto.PostQuoteInput, uid string) (models.Quote, error) {
 	book := models.Book{
-		Isbn:          postQuoteInput.Book.Isbn,
+		ISBN:          postQuoteInput.Book.Isbn,
 		Title:         postQuoteInput.Book.Title,
 		Author:        postQuoteInput.Book.Author,
 		Publisher:     postQuoteInput.Book.Publisher,
@@ -50,8 +60,8 @@ func (service *Service) PostQuote(postQuoteInput dto.PostQuoteInput, uid string)
 	quote := models.Quote{
 		Text:   postQuoteInput.Text,
 		Page:   postQuoteInput.Page,
-		ISBN:   postQuoteInput.Book.Isbn,
 		BookID: book.ID,
+		Book:   book,
 		UID:    uid,
 	}
 	if result := service.db.Save(&quote); result.Error != nil {
@@ -68,4 +78,27 @@ func (service *Service) PostQuote(postQuoteInput dto.PostQuoteInput, uid string)
 		}
 	}
 	return quote, nil
+}
+
+func (service *Service) UpdateQuote(updateQuoteInput dto.UpdateQuoteInput, id string) (models.Quote, error) {
+	quote := models.Quote{
+		Text: updateQuoteInput.Text,
+		Page: updateQuoteInput.Page,
+		Tags: updateQuoteInput.Tags,
+	}
+	if result := service.db.Model(models.Quote{}).Where("ID = ?", id).Updates(quote); result.Error != nil {
+		return models.Quote{}, result.Error
+	}
+	return quote, nil
+}
+
+func (service *Service) DeleteQuote(id string) (result bool, err error) {
+	i, err := strconv.Atoi(id)
+	if err != nil {
+		return false, err
+	}
+	if result := service.db.Select("Tags").Delete(&models.Quote{ID: i}); result.Error != nil {
+		return false, result.Error
+	}
+	return true, nil
 }
