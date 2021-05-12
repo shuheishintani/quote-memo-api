@@ -1,9 +1,9 @@
 version: "3.8"
 
 services:
-  db:
+  db-dev:
     image: postgres:12.2-alpine
-    container_name: "quote-manager-db"
+    container_name: "quote-manager-db-dev"
     ports:
       - "5432:5432"
     environment:
@@ -14,6 +14,16 @@ services:
       - fullstack
     volumes:
       - database_postgres:/var/lib/posgtresql/data 
+
+  db-test:
+    image: postgres:12.2-alpine
+    container_name: "quote-manager-db-test"
+    ports:
+      - "5431:5432"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
   
   api:
     build: .
@@ -22,13 +32,13 @@ services:
       DB_USERNAME: "postgres"
       DB_PASSWORD: "postgres" 
       DB_DB: "postgres"
-      DB_HOST: "db"
+      DB_HOST: "db-dev"
       DB_TABLE: "postgres"
       DB_PORT: "5432"
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      - db-dev
     volumes:
         - .:/app
     command: air

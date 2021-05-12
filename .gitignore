@@ -1,4 +1,5 @@
 .vscode/
 tmp/
 .env
+.env.test
 serviceAccountKey.json
