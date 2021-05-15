@@ -23,8 +23,6 @@ func TestGetQuotes(t *testing.T) {
 	}
 	defer postgresDB.Close()
 
-	createFixtures(db)
-
 	tags := []models.Tag{
 		{Name: "tag1"},
 		{Name: "tag2"},
@@ -55,7 +53,7 @@ func TestGetQuotes(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, len(result), 1)
-	assert.Equal(t, result[0].UID, "randomUID")
+	assert.Equal(t, result[0].ID, "randomUID")
 	assert.Equal(t, result[0].Text, "quote1")
 
 	db.Migrator().DropTable("quote_tags")

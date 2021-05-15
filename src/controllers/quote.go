@@ -8,6 +8,15 @@ import (
 	"github.com/shuheishintani/quote-manager-api/src/dto"
 )
 
+func (ctl *Controller) GetPublicQuotes(c *gin.Context) {
+	quotes, err := ctl.service.GetPublicQuotes()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, quotes)
+}
+
 func (ctl *Controller) GetPrivateQuotes(c *gin.Context) {
 	uid := c.GetString("uid")
 	strTags := c.Query("tags")
@@ -37,7 +46,7 @@ func (ctl *Controller) PostQuote(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, quote)
+	c.JSON(http.StatusCreated, quote)
 }
 
 func (ctl *Controller) UpdateQuote(c *gin.Context) {
@@ -49,7 +58,7 @@ func (ctl *Controller) UpdateQuote(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-	if quote.UID != uid {
+	if quote.UserID != uid {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden action"})
 		return
 	}
@@ -77,7 +86,7 @@ func (ctl *Controller) DeleteQuote(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-	if quote.UID != uid {
+	if quote.UserID != uid {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden action"})
 		return
 	}

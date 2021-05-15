@@ -13,8 +13,9 @@ type Book struct {
 }
 
 type PostQuoteInput struct {
-	Text string       `json:"text"`
-	Page int          `json:"page"`
-	Book Book         `json:"book"`
-	Tags []models.Tag `json:"tags"`
+	Text      string       `json:"text"`
+	Page      int          `json:"page"`
+	Published bool         `json:"published"`
+	Book      Book         `json:"book"`
+	Tags      []models.Tag `json:"tags"`
 }

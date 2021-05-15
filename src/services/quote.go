@@ -5,7 +5,16 @@ import (
 
 	"github.com/shuheishintani/quote-manager-api/src/dto"
 	"github.com/shuheishintani/quote-manager-api/src/models"
+	"gorm.io/gorm/clause"
 )
+
+func (service *Service) GetPublicQuotes() ([]models.Quote, error) {
+	quotes := []models.Quote{}
+	if result := service.db.Preload(clause.Associations).Where("Published = true").Find(&quotes); result.Error != nil {
+		return []models.Quote{}, result.Error
+	}
+	return quotes, nil
+}
 
 func (s *Service) GetQuoteById(id string) (models.Quote, error) {
 	quote := models.Quote{}
@@ -32,7 +41,7 @@ func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]model
 		Where("t.name IN (?)", tagNames).
 		Group("quote_id")
 
-	if result := service.db.Preload("Tags").
+	if result := service.db.Preload("Book").Preload("Tags").
 		Joins(
 			"JOIN (?) AS matched ON quote_id = quotes.id AND matched.count = ?",
 			subQuery,
@@ -53,27 +62,27 @@ func (service *Service) PostQuote(postQuoteInput dto.PostQuoteInput, uid string)
 		Publisher:     postQuoteInput.Book.Publisher,
 		CoverImageUrl: postQuoteInput.Book.CoverImageUrl,
 	}
-	if result := service.db.FirstOrCreate(&book); result.Error != nil {
+	if result := service.db.Where(book).FirstOrCreate(&book); result.Error != nil {
 		return models.Quote{}, result.Error
 	}
 
 	quote := models.Quote{
-		Text:   postQuoteInput.Text,
-		Page:   postQuoteInput.Page,
-		BookID: book.ID,
-		Book:   book,
-		UID:    uid,
+		Text:      postQuoteInput.Text,
+		Page:      postQuoteInput.Page,
+		Published: postQuoteInput.Published,
+		BookID:    book.ID,
+		Book:      book,
+		UserID:    uid,
 	}
 	if result := service.db.Save(&quote); result.Error != nil {
 		return models.Quote{}, result.Error
 	}
 
 	for _, tag := range postQuoteInput.Tags {
-		registeredTag := models.Tag{}
-		if result := service.db.FirstOrCreate(&registeredTag, tag); result.Error != nil {
+		if result := service.db.Where(tag).FirstOrCreate(&tag); result.Error != nil {
 			return models.Quote{}, result.Error
 		}
-		if err := service.db.Model(&quote).Association("Tags").Append(&registeredTag); err != nil {
+		if err := service.db.Model(&quote).Association("Tags").Append(&tag); err != nil {
 			return models.Quote{}, err
 		}
 	}
@@ -82,14 +91,19 @@ func (service *Service) PostQuote(postQuoteInput dto.PostQuoteInput, uid string)
 
 func (service *Service) UpdateQuote(updateQuoteInput dto.UpdateQuoteInput, id string) (models.Quote, error) {
 	quote := models.Quote{
-		Text: updateQuoteInput.Text,
-		Page: updateQuoteInput.Page,
-		Tags: updateQuoteInput.Tags,
+		Text:      updateQuoteInput.Text,
+		Page:      updateQuoteInput.Page,
+		Published: updateQuoteInput.Published,
+		Tags:      updateQuoteInput.Tags,
 	}
 	if result := service.db.Model(models.Quote{}).Where("ID = ?", id).Updates(quote); result.Error != nil {
 		return models.Quote{}, result.Error
 	}
-	return quote, nil
+	updated, err := service.GetQuoteById(id)
+	if err != nil {
+		return models.Quote{}, err
+	}
+	return updated, nil
 }
 
 func (service *Service) DeleteQuote(id string) (result bool, err error) {
