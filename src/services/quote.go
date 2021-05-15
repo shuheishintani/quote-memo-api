@@ -28,7 +28,7 @@ func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]model
 	quotes := []models.Quote{}
 
 	if len(tagNames) == 0 {
-		if result := service.db.Preload("Book").Preload("Tags").Where("UID = ?", uid).Find(&quotes); result.Error != nil {
+		if result := service.db.Preload(clause.Associations).Where("user_id = ?", uid).Find(&quotes); result.Error != nil {
 			return []models.Quote{}, result.Error
 		}
 		return quotes, nil
@@ -90,15 +90,30 @@ func (service *Service) PostQuote(postQuoteInput dto.PostQuoteInput, uid string)
 }
 
 func (service *Service) UpdateQuote(updateQuoteInput dto.UpdateQuoteInput, id string) (models.Quote, error) {
-	quote := models.Quote{
-		Text:      updateQuoteInput.Text,
-		Page:      updateQuoteInput.Page,
-		Published: updateQuoteInput.Published,
-		Tags:      updateQuoteInput.Tags,
-	}
-	if result := service.db.Model(models.Quote{}).Where("ID = ?", id).Updates(quote); result.Error != nil {
+	if result := service.db.Model(&models.Quote{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"Text":      updateQuoteInput.Text,
+		"Page":      updateQuoteInput.Page,
+		"Published": updateQuoteInput.Published,
+	}); result.Error != nil {
 		return models.Quote{}, result.Error
 	}
+
+	i, err := strconv.Atoi(id)
+	if err != nil {
+		return models.Quote{}, err
+	}
+
+	for _, tag := range updateQuoteInput.Tags {
+		if result := service.db.Where(tag).FirstOrCreate(&tag); result.Error != nil {
+			return models.Quote{}, result.Error
+		}
+
+		if err := service.db.Model(&models.Quote{ID: i}).Association("Tags").Append(&tag); err != nil {
+			return models.Quote{}, err
+		}
+
+	}
+
 	updated, err := service.GetQuoteById(id)
 	if err != nil {
 		return models.Quote{}, err

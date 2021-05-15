@@ -35,6 +35,7 @@ func (ctl *Controller) GetPrivateQuotes(c *gin.Context) {
 
 func (ctl *Controller) PostQuote(c *gin.Context) {
 	uid := c.GetString("uid")
+
 	postQuoteInput := dto.PostQuoteInput{}
 	if err := c.BindJSON(&postQuoteInput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
