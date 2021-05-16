@@ -1,6 +1,6 @@
 package controllers
 
-import "github.com/shuheishintani/quote-manager-api/src/services"
+import "github.com/shuheishintani/quote-memo-api/src/services"
 
 type Controller struct {
 	service *services.Service

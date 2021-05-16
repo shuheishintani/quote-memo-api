@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"github.com/shuheishintani/quote-manager-api/src/models"
+	"github.com/shuheishintani/quote-memo-api/src/models"
 )
 
 type Book struct {

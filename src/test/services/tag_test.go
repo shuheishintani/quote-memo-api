@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	_ "github.com/lib/pq"
-	"github.com/shuheishintani/quote-manager-api/src/services"
+	"github.com/shuheishintani/quote-memo-api/src/services"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -3,8 +3,8 @@ package services
 import (
 	"strconv"
 
-	"github.com/shuheishintani/quote-manager-api/src/dto"
-	"github.com/shuheishintani/quote-manager-api/src/models"
+	"github.com/shuheishintani/quote-memo-api/src/dto"
+	"github.com/shuheishintani/quote-memo-api/src/models"
 	"gorm.io/gorm/clause"
 )
 

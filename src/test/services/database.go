@@ -1,8 +1,8 @@
 package test
 
 import (
-	"github.com/shuheishintani/quote-manager-api/src/models"
-	"github.com/shuheishintani/quote-manager-api/src/util"
+	"github.com/shuheishintani/quote-memo-api/src/models"
+	"github.com/shuheishintani/quote-memo-api/src/util"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

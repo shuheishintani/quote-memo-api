@@ -4,10 +4,10 @@ import (
 	"log"
 	"testing"
 
-	"github.com/shuheishintani/quote-manager-api/src/dto"
-	"github.com/shuheishintani/quote-manager-api/src/models"
-	"github.com/shuheishintani/quote-manager-api/src/services"
-	"github.com/shuheishintani/quote-manager-api/src/util"
+	"github.com/shuheishintani/quote-memo-api/src/dto"
+	"github.com/shuheishintani/quote-memo-api/src/models"
+	"github.com/shuheishintani/quote-memo-api/src/services"
+	"github.com/shuheishintani/quote-memo-api/src/util"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/shuheishintani/quote-manager-api/src/dto"
-	"github.com/shuheishintani/quote-manager-api/src/models"
+	"github.com/shuheishintani/quote-memo-api/src/dto"
+	"github.com/shuheishintani/quote-memo-api/src/models"
 )
 
 func (service *Service) CreateOrUpdateUser(userInput dto.UserInput) (models.User, error) {

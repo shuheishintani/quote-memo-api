@@ -3,7 +3,7 @@ version: "3.8"
 services:
   db-dev:
     image: postgres:12.2-alpine
-    container_name: "quote-manager-db-dev"
+    container_name: "quote-memo-db-dev"
     ports:
       - "5432:5432"
     environment:
@@ -17,7 +17,7 @@ services:
 
   db-test:
     image: postgres:12.2-alpine
-    container_name: "quote-manager-db-test"
+    container_name: "quote-memo-db-test"
     ports:
       - "5431:5432"
     environment:
@@ -27,14 +27,16 @@ services:
   
   api:
     build: .
-    container_name: "quote-manager-api" 
+    container_name: "quote-memo-api" 
     environment:
+      APP_ENV: "development"
       DB_USERNAME: "postgres"
       DB_PASSWORD: "postgres" 
       DB_DB: "postgres"
       DB_HOST: "db-dev"
       DB_TABLE: "postgres"
       DB_PORT: "5432"
+      CLIENT_ORIGIN: "http://localhost:3000"
     ports:
       - "8080:8080"
     depends_on:

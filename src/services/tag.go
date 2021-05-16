@@ -1,6 +1,6 @@
 package services
 
-import "github.com/shuheishintani/quote-manager-api/src/models"
+import "github.com/shuheishintani/quote-memo-api/src/models"
 
 func (service *Service) GetTags() ([]models.Tag, error) {
 	tags := []models.Tag{}

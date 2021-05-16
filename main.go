@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -9,10 +10,11 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/shuheishintani/quote-manager-api/src/config"
-	"github.com/shuheishintani/quote-manager-api/src/controllers"
-	"github.com/shuheishintani/quote-manager-api/src/middleware"
-	"github.com/shuheishintani/quote-manager-api/src/services"
+	_ "github.com/lib/pq"
+	"github.com/shuheishintani/quote-memo-api/src/config"
+	"github.com/shuheishintani/quote-memo-api/src/controllers"
+	"github.com/shuheishintani/quote-memo-api/src/middleware"
+	"github.com/shuheishintani/quote-memo-api/src/services"
 	"gorm.io/gorm"
 )
 
@@ -50,6 +52,7 @@ func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 }
 
 func main() {
+	fmt.Println(os.Getenv("APP_ENV"))
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file", err)

@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shuheishintani/quote-manager-api/src/services"
+	"github.com/shuheishintani/quote-memo-api/src/services"
 )
 
 func (ctl *Controller) GetBooks(c *gin.Context) {

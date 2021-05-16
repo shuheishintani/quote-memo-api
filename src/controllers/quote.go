@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shuheishintani/quote-manager-api/src/dto"
+	"github.com/shuheishintani/quote-memo-api/src/dto"
 )
 
 func (ctl *Controller) GetPublicQuotes(c *gin.Context) {

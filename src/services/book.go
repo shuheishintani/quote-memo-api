@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/shuheishintani/quote-manager-api/src/dto"
+	"github.com/shuheishintani/quote-memo-api/src/dto"
 )
 
 type ApiResponse struct {
