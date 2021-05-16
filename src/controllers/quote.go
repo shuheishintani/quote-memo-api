@@ -9,7 +9,13 @@ import (
 )
 
 func (ctl *Controller) GetPublicQuotes(c *gin.Context) {
-	quotes, err := ctl.service.GetPublicQuotes()
+	strTags := c.Query("tags")
+	var tagNames []string
+	if strTags != "" {
+		tagNames = strings.Split(strTags, ",")
+	}
+	quotes, err := ctl.service.GetPublicQuotes(tagNames)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

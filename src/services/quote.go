@@ -8,27 +8,11 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func (service *Service) GetPublicQuotes() ([]models.Quote, error) {
-	quotes := []models.Quote{}
-	if result := service.db.Preload(clause.Associations).Where("Published = true").Find(&quotes); result.Error != nil {
-		return []models.Quote{}, result.Error
-	}
-	return quotes, nil
-}
-
-func (s *Service) GetQuoteById(id string) (models.Quote, error) {
-	quote := models.Quote{}
-	if result := s.db.Preload("Book").Preload("Tags").First(&quote, id); result.Error != nil {
-		return models.Quote{}, result.Error
-	}
-	return quote, nil
-}
-
-func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]models.Quote, error) {
+func (service *Service) GetPublicQuotes(tagNames []string) ([]models.Quote, error) {
 	quotes := []models.Quote{}
 
 	if len(tagNames) == 0 {
-		if result := service.db.Preload(clause.Associations).Where("user_id = ?", uid).Find(&quotes); result.Error != nil {
+		if result := service.db.Preload(clause.Associations).Where("published = true").Find(&quotes); result.Error != nil {
 			return []models.Quote{}, result.Error
 		}
 		return quotes, nil
@@ -41,13 +25,51 @@ func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]model
 		Where("t.name IN (?)", tagNames).
 		Group("quote_id")
 
-	if result := service.db.Preload("Book").Preload("Tags").
+	if result := service.db.Preload(clause.Associations).
 		Joins(
 			"JOIN (?) AS matched ON quote_id = quotes.id AND matched.count = ?",
 			subQuery,
 			len(tagNames),
 		).
-		Where("UID = ?", uid).
+		Find(&quotes); result.Error != nil {
+		return []models.Quote{}, result.Error
+	}
+	return quotes, nil
+
+}
+
+func (s *Service) GetQuoteById(id string) (models.Quote, error) {
+	quote := models.Quote{}
+	if result := s.db.Preload("Tags").Preload("Book").First(&quote, id); result.Error != nil {
+		return models.Quote{}, result.Error
+	}
+	return quote, nil
+}
+
+func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]models.Quote, error) {
+	quotes := []models.Quote{}
+
+	if len(tagNames) == 0 {
+		if result := service.db.Preload("Tags").Preload("Book").Where("user_id = ?", uid).Find(&quotes); result.Error != nil {
+			return []models.Quote{}, result.Error
+		}
+		return quotes, nil
+	}
+
+	subQuery := service.db.
+		Select("quote_id, count(*) AS count").
+		Table("quote_tags qt").
+		Joins("JOIN tags t ON qt.tag_id = t.id").
+		Where("t.name IN (?)", tagNames).
+		Group("quote_id")
+
+	if result := service.db.Preload(clause.Associations).
+		Joins(
+			"JOIN (?) AS matched ON quote_id = quotes.id AND matched.count = ?",
+			subQuery,
+			len(tagNames),
+		).
+		Where("user_id = ?", uid).
 		Find(&quotes); result.Error != nil {
 		return []models.Quote{}, result.Error
 	}
