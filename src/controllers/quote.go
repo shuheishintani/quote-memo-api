@@ -42,7 +42,7 @@ func (ctl *Controller) GetPrivateQuotes(c *gin.Context) {
 func (ctl *Controller) PostQuote(c *gin.Context) {
 	uid := c.GetString("uid")
 
-	postQuoteInput := dto.PostQuoteInput{}
+	postQuoteInput := dto.QuoteInput{}
 	if err := c.BindJSON(&postQuoteInput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -70,7 +70,7 @@ func (ctl *Controller) UpdateQuote(c *gin.Context) {
 		return
 	}
 
-	updateQuoteInput := dto.UpdateQuoteInput{}
+	updateQuoteInput := dto.QuoteInput{}
 	if err := c.BindJSON(&updateQuoteInput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

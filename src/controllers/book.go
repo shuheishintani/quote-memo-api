@@ -4,14 +4,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shuheishintani/quote-manager-api/src/dto"
+	"github.com/shuheishintani/quote-manager-api/src/services"
 )
 
 func (ctl *Controller) GetBooks(c *gin.Context) {
 	title := c.Query("title")
 	author := c.Query("author")
 	page := c.Query("page")
-	getBooksInput := dto.GetBooksInput{
+	getBooksInput := services.GetBooksQuery{
 		Title:  title,
 		Author: author,
 		Page:   page,

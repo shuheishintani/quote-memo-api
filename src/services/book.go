@@ -56,7 +56,13 @@ type ApiResponse struct {
 	First            int           `json:"first"`
 }
 
-func (service *Service) GetBooks(getBooksInput dto.GetBooksInput) ([]dto.Book, error) {
+type GetBooksQuery struct {
+	Title  string `json:"title"`
+	Author string `json:"author"`
+	Page   string `json:"page"`
+}
+
+func (service *Service) GetBooks(getBooksInput GetBooksQuery) ([]dto.Book, error) {
 	title := getBooksInput.Title
 	author := getBooksInput.Author
 	page := getBooksInput.Page

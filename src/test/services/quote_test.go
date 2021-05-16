@@ -39,7 +39,7 @@ func TestGetQuotes(t *testing.T) {
 	}
 	db.Create(&book)
 
-	postQuoteInput := dto.PostQuoteInput{
+	postQuoteInput := dto.QuoteInput{
 		Text: "quote1",
 		Page: util.RandomInt(1, 500),
 		Book: book,
@@ -90,7 +90,7 @@ func TestPostQuote(t *testing.T) {
 	}
 	db.Create(&tags)
 
-	postQuoteInput := dto.PostQuoteInput{
+	postQuoteInput := dto.QuoteInput{
 		Text: util.RandomString(6),
 		Page: util.RandomInt(1, 500),
 		Book: book,

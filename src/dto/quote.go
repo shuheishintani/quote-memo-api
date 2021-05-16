@@ -12,7 +12,7 @@ type Book struct {
 	CoverImageUrl string `json:"coverImageUrl"`
 }
 
-type PostQuoteInput struct {
+type QuoteInput struct {
 	Text      string       `json:"text"`
 	Page      int          `json:"page"`
 	Published bool         `json:"published"`

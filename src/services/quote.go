@@ -76,7 +76,7 @@ func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]model
 	return quotes, nil
 }
 
-func (service *Service) PostQuote(postQuoteInput dto.PostQuoteInput, uid string) (models.Quote, error) {
+func (service *Service) PostQuote(postQuoteInput dto.QuoteInput, uid string) (models.Quote, error) {
 	book := models.Book{
 		ISBN:          postQuoteInput.Book.Isbn,
 		Title:         postQuoteInput.Book.Title,
@@ -111,7 +111,7 @@ func (service *Service) PostQuote(postQuoteInput dto.PostQuoteInput, uid string)
 	return quote, nil
 }
 
-func (service *Service) UpdateQuote(updateQuoteInput dto.UpdateQuoteInput, id string) (models.Quote, error) {
+func (service *Service) UpdateQuote(updateQuoteInput dto.QuoteInput, id string) (models.Quote, error) {
 	if result := service.db.Model(&models.Quote{}).Where("id = ?", id).Updates(map[string]interface{}{
 		"Text":      updateQuoteInput.Text,
 		"Page":      updateQuoteInput.Page,
