@@ -55,7 +55,7 @@ jobs:
           sed -i -e 's@$CLIENT_ORIGIN@${{ secrets.CLIENT_ORIGIN }}@g' app.yaml
 
       - name: deploy fbServiceAccountKey.json
-        run: ${{ sercrets.FIREBASE_SA_KEY_BASE64 }} | base64 --decode --ignore-garbage > ./fbServiceAccountKey.json
+        run: ${{ secrets.FIREBASE_SA_KEY_BASE64 }} | base64 --decode --ignore-garbage > ./fbServiceAccountKey.json
 
       - name: Deploy an App Engine app
         id: deploy-app
