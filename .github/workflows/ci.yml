@@ -51,6 +51,7 @@ jobs:
           sed -i -e 's/$INSTANCE_CONNECTION_NAME/${{ secrets.INSTANCE_CONNECTION_NAME }}/g' app.yaml
           sed -i -e 's/$DB_NAME/${{ secrets.DB_NAME }}/g' app.yaml
           sed -i -e 's/$RAKUTEN_APP_ID/${{ secrets.RAKUTEN_APP_ID }}/g' app.yaml
+          sed -i -e 's@$RAKUTEN_APP_ID@${{ secrets.RAKUTEN_APP_ID }}@g' app.yaml
 
       - name: Deploy an App Engine app
         id: deploy-app
