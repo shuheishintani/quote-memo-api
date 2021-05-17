@@ -53,9 +53,12 @@ func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 
 func main() {
 	fmt.Println(os.Getenv("APP_ENV"))
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file", err)
+
+	if os.Getenv("APP_ENV") == "development" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file", err)
+		}
 	}
 
 	db, err := config.GormConnect()
