@@ -1,0 +1,10 @@
+runtime: go113
+env_variables:
+  DB_USER: "$DB_USER"
+  DB_PASS: "$DB_PASS"
+  INSTANCE_CONNECTION_NAME: "$INSTANCE_CONNECTION_NAME"
+  DB_NAME: "$DB_NAME"
+  CLIENT_ORIGIN: "https://quote-memo-client.vercel.app"
+
+  
+

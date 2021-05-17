@@ -44,6 +44,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: replace app.yaml
+        run: |
+          sed -i -e 's/$DB_USER/${{ secrets.DB_USER }}/g' app.yaml
+          sed -i -e 's/$DB_PASS/${{ secrets.DB_PASS }}/g' app.yaml
+          sed -i -e 's/$INSTANCE_CONNECTION_NAME/${{ secrets.INSTANCE_CONNECTION_NAME }}/g' app.yaml
+          sed -i -e 's/$DB_NAME/${{ secrets.DB_NAME }}/g' app.yaml
+
       - name: Deploy an App Engine app
         id: deploy-app
         uses: google-github-actions/deploy-appengine@v0.3.1

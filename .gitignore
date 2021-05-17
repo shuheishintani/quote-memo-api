@@ -3,4 +3,3 @@ tmp/
 .env
 .env.test
 serviceAccountKey.json
-app.yaml
