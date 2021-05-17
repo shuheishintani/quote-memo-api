@@ -11,7 +11,7 @@ import (
 )
 
 func InitAuth() (*auth.Client, error) {
-	serviceAccountKeyFilePath, err := filepath.Abs("./serviceAccountKey.json")
+	serviceAccountKeyFilePath, err := filepath.Abs("./fbSserviceAccountKey.json")
 	if err != nil {
 		log.Fatal("Unable to load serviceAccountKeys.json file")
 	}

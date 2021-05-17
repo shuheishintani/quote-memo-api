@@ -2,4 +2,4 @@
 tmp/
 .env
 .env.test
-serviceAccountKey.json
+fbServiceAccountKey.json

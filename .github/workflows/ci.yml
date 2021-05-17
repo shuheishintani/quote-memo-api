@@ -54,6 +54,9 @@ jobs:
           sed -i -e 's@$RAKUTEN_BOOK_API_URL@${{ secrets.RAKUTEN_BOOK_API_URL }}@g' app.yaml
           sed -i -e 's@$CLIENT_ORIGIN@${{ secrets.CLIENT_ORIGIN }}@g' app.yaml
 
+      - name: deploy fbServiceAccountKey.json
+        run: ${{ sercrets.FIREBASE_SA_KEY_BASE64 }} | base64 --decode --ignore-garbage > fbServiceAccountKey.json
+
       - name: Deploy an App Engine app
         id: deploy-app
         uses: google-github-actions/deploy-appengine@v0.3.1
