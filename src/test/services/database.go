@@ -27,7 +27,12 @@ func createFixtures(db *gorm.DB) {
 	}
 	db.Create(&tags)
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 20; i++ {
+		tags = append(tags, models.Tag{Name: util.RandomString(6)})
+	}
+	db.Create(&tags)
+
+	for i := 0; i < 20; i++ {
 		books = append(books, models.Book{
 			ISBN:          util.RandomStringNumber(10),
 			Title:         util.RandomString(6),

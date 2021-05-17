@@ -4,6 +4,9 @@ import (
 	"math/rand"
 	"strings"
 	"time"
+
+	"github.com/shuheishintani/quote-memo-api/src/dto"
+	"github.com/shuheishintani/quote-memo-api/src/models"
 )
 
 func init() {
@@ -36,4 +39,32 @@ func RandomStringNumber(n int) string {
 		sb.WriteByte(c)
 	}
 	return sb.String()
+}
+
+func RandomUser() models.User {
+	user := models.User{
+		ID:              RandomString(10),
+		Username:        RandomString(10),
+		ProfileImageUrl: RandomString(10),
+		Provider:        RandomString(10),
+	}
+	return user
+}
+
+func RandomBook() dto.Book {
+	book := dto.Book{
+		Title:         RandomString(10),
+		Isbn:          RandomStringNumber(10),
+		Author:        RandomString(10),
+		Publisher:     RandomString(10),
+		CoverImageUrl: RandomString(10),
+	}
+	return book
+}
+
+func RandomTag() models.Tag {
+	tag := models.Tag{
+		Name: RandomString(6),
+	}
+	return tag
 }

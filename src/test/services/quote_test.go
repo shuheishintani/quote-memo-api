@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"log"
 	"testing"
 
@@ -23,43 +24,51 @@ func TestGetQuotes(t *testing.T) {
 	}
 	defer postgresDB.Close()
 
+	user := util.RandomUser()
+	db.Create(&user)
+
+	tag1 := util.RandomTag()
+	tag2 := util.RandomTag()
+	tag3 := util.RandomTag()
 	tags := []models.Tag{
-		{Name: "tag1"},
-		{Name: "tag2"},
-		{Name: "tag3"},
+		tag1, tag2, tag3,
 	}
 	db.Create(&tags)
 
-	book := dto.Book{
-		Title:         "book1",
-		Isbn:          util.RandomStringNumber(10),
-		Author:        "author1",
-		Publisher:     util.RandomString(6),
-		CoverImageUrl: util.RandomString(6),
-	}
+	book := util.RandomBook()
 	db.Create(&book)
 
 	postQuoteInput := dto.QuoteInput{
-		Text: "quote1",
+		Text: util.RandomString(10),
 		Page: util.RandomInt(1, 500),
 		Book: book,
 		Tags: tags,
 	}
 
 	s := services.NewService(db)
-	s.PostQuote(postQuoteInput, "randomUID")
+	quote1, err := s.PostQuote(postQuoteInput, user.ID)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	result, err := s.GetPrivateQuotes([]string{"tag1", "tag2", "tag3"}, "randomUID")
+	result, err := s.GetPrivateQuotes([]string{tag1.Name, tag2.Name, tag3.Name}, user.ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%+v", result)
+
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
-	assert.Equal(t, len(result), 1)
-	assert.Equal(t, result[0].ID, "randomUID")
-	assert.Equal(t, result[0].Text, "quote1")
+	assert.Equal(t, 1, len(result))
+	assert.Equal(t, quote1.ID, result[0].ID)
+	assert.Equal(t, quote1.Text, result[0].Text)
 
 	db.Migrator().DropTable("quote_tags")
 	db.Migrator().DropTable("quotes")
 	db.Migrator().DropTable("books")
 	db.Migrator().DropTable("tags")
+	db.Migrator().DropTable("users")
 }
 
 func TestPostQuote(t *testing.T) {
@@ -74,40 +83,44 @@ func TestPostQuote(t *testing.T) {
 	}
 	defer postgresDB.Close()
 
-	book := dto.Book{
-		Title:         util.RandomString(6),
-		Isbn:          util.RandomStringNumber(10),
-		Author:        util.RandomString(6),
-		Publisher:     util.RandomString(6),
-		CoverImageUrl: util.RandomString(6),
-	}
+	user := util.RandomUser()
+	db.Create(&user)
+
+	book := util.RandomBook()
 	db.Create(&book)
 
+	tag1 := util.RandomTag()
+	tag2 := util.RandomTag()
+	tag3 := util.RandomTag()
+
 	tags := []models.Tag{
-		{Name: util.RandomString(6)},
-		{Name: util.RandomString(6)},
-		{Name: util.RandomString(6)},
+		tag1, tag2, tag3,
 	}
 	db.Create(&tags)
 
 	postQuoteInput := dto.QuoteInput{
-		Text: util.RandomString(6),
+		Text: util.RandomString(10),
 		Page: util.RandomInt(1, 500),
 		Book: book,
 		Tags: tags,
 	}
 
 	s := services.NewService(db)
-	result, err := s.PostQuote(postQuoteInput, util.RandomStringNumber(10))
+	result, err := s.PostQuote(postQuoteInput, user.ID)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
-	assert.Equal(t, result.Text, postQuoteInput.Text)
-	assert.Equal(t, len(result.Tags), len(postQuoteInput.Tags))
-	assert.Equal(t, result.Book.Title, postQuoteInput.Book.Title)
+	assert.Equal(t, postQuoteInput.Text, result.Text)
+	assert.Equal(t, postQuoteInput.Page, result.Page)
+	assert.Equal(t, postQuoteInput.Book.Title, result.Book.Title)
+	assert.Equal(t, len(postQuoteInput.Tags), len(result.Tags))
+	assert.Equal(t, len(tag1.Name), len(result.Tags[0].Name))
+	assert.Equal(t, len(tag2.Name), len(result.Tags[1].Name))
+	assert.Equal(t, len(tag3.Name), len(result.Tags[2].Name))
 
 	db.Migrator().DropTable("quote_tags")
 	db.Migrator().DropTable("quotes")
 	db.Migrator().DropTable("books")
 	db.Migrator().DropTable("tags")
+	db.Migrator().DropTable("users")
 }
