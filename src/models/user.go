@@ -10,5 +10,5 @@ type User struct {
 	ProfileImageUrl string    `json:"profile_image_url"`
 	Provider        string    `json:"provider"`
 	Quotes          []Quote   `json:"quotes"`
-	FavoriteQuotes  []Quote   `gorm:"many2many:favorite;" json:"favorite_quotes"`
+	FavoriteQuotes  []Quote   `gorm:"many2many:users_quotes;" json:"favorite_quotes"`
 }

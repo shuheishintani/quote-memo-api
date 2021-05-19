@@ -162,7 +162,7 @@ func (service *Service) AddFavoriteQuote(uid string, id string) (models.User, er
 
 	user := models.User{ID: uid}
 
-	if err := service.db.Model(&user).Association("Quotes").Append(&quote); err != nil {
+	if err := service.db.Model(&user).Association("FavoriteQuotes").Append(&quote); err != nil {
 		return models.User{}, err
 	}
 	return user, nil

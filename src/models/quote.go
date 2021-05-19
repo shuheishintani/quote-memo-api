@@ -9,7 +9,7 @@ type Quote struct {
 	Text      string    `json:"text"`
 	Page      int       `json:"page"`
 	Published bool      `gorm:"default:false" json:"published"`
-	Tags      []Tag     `gorm:"many2many:quote_tag;" json:"tags"`
+	Tags      []Tag     `gorm:"many2many:quotes_tags;" json:"tags"`
 	Book      Book      `json:"book"`
 	BookID    int       `json:"book_id"`
 	User      User      `json:"user"`

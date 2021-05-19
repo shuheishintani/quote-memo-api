@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -27,6 +28,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 		c.Set("uid", token.UID)
+		fmt.Println(token.UID)
 		c.Next()
 	}
 }
