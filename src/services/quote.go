@@ -108,6 +108,7 @@ func (service *Service) PostQuote(postQuoteInput dto.QuoteInput, uid string) (mo
 			return models.Quote{}, err
 		}
 	}
+
 	return quote, nil
 }
 
@@ -148,7 +149,12 @@ func (service *Service) DeleteQuote(id string) (result bool, err error) {
 	if err != nil {
 		return false, err
 	}
-	if result := service.db.Select("Tags").Delete(&models.Quote{ID: i}); result.Error != nil {
+
+	if err := service.db.Model(&models.Quote{ID: i}).Association("FavoriteUsers").Clear(); err != nil {
+		return false, err
+	}
+
+	if result := service.db.Select(clause.Associations).Delete(&models.Quote{ID: i}); result.Error != nil {
 		return false, result.Error
 	}
 	return true, nil
