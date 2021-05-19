@@ -40,7 +40,8 @@ func TestGetTags(t *testing.T) {
 	assert.Equal(t, tag2.Name, result[1].Name)
 	assert.Equal(t, tag3.Name, result[2].Name)
 
-	db.Migrator().DropTable("quote_tags")
+	db.Migrator().DropTable("quotes_tags")
+	db.Migrator().DropTable("users_quotes")
 	db.Migrator().DropTable("quotes")
 	db.Migrator().DropTable("books")
 	db.Migrator().DropTable("tags")

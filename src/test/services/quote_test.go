@@ -64,7 +64,8 @@ func TestGetQuotes(t *testing.T) {
 	assert.Equal(t, quote1.ID, result[0].ID)
 	assert.Equal(t, quote1.Text, result[0].Text)
 
-	db.Migrator().DropTable("quote_tags")
+	db.Migrator().DropTable("quotes_tags")
+	db.Migrator().DropTable("users_quotes")
 	db.Migrator().DropTable("quotes")
 	db.Migrator().DropTable("books")
 	db.Migrator().DropTable("tags")
@@ -118,7 +119,8 @@ func TestPostQuote(t *testing.T) {
 	assert.Equal(t, len(tag2.Name), len(result.Tags[1].Name))
 	assert.Equal(t, len(tag3.Name), len(result.Tags[2].Name))
 
-	db.Migrator().DropTable("quote_tags")
+	db.Migrator().DropTable("quotes_tags")
+	db.Migrator().DropTable("users_quotes")
 	db.Migrator().DropTable("quotes")
 	db.Migrator().DropTable("books")
 	db.Migrator().DropTable("tags")
