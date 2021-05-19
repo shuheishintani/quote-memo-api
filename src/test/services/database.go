@@ -12,6 +12,6 @@ func gormConnectForTesting() (*gorm.DB, error) {
 	if err != nil {
 		return db, err
 	}
-	db.AutoMigrate(&models.Quote{}, &models.Book{}, &models.Tag{})
+	db.AutoMigrate(&models.Quote{}, &models.Book{}, &models.Tag{}, &models.User{})
 	return db, nil
 }

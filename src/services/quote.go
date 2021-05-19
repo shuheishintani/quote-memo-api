@@ -20,7 +20,7 @@ func (service *Service) GetPublicQuotes(tagNames []string) ([]models.Quote, erro
 
 	subQuery := service.db.
 		Select("quote_id, count(*) AS count").
-		Table("quote_tags qt").
+		Table("quotes_tags qt").
 		Joins("JOIN tags t ON qt.tag_id = t.id").
 		Where("t.name IN (?)", tagNames).
 		Group("quote_id")
@@ -59,7 +59,7 @@ func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]model
 
 	subQuery := service.db.
 		Select("quote_id, count(*) AS count").
-		Table("quote_tags qt").
+		Table("quotes_tags qt").
 		Joins("JOIN tags t ON qt.tag_id = t.id").
 		Where("t.name IN (?)", tagNames).
 		Group("quote_id")
@@ -94,6 +94,7 @@ func (service *Service) PostQuote(postQuoteInput dto.QuoteInput, uid string) (mo
 		Page:      postQuoteInput.Page,
 		Published: postQuoteInput.Published,
 		BookID:    book.ID,
+		Book:      book,
 		UserID:    uid,
 	}
 	if result := service.db.Save(&quote); result.Error != nil {
