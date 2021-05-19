@@ -47,6 +47,7 @@ func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 	private.POST("/quotes", controller.PostQuote)
 	private.PUT("/quotes/:id", controller.UpdateQuote)
 	private.DELETE("/quotes/:id", controller.DeleteQuote)
+	private.PUT("/quotes/:id/favorite", controller.AddFavoriteQuote)
 
 	return r
 }

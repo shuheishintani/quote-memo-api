@@ -31,6 +31,7 @@ func (service *Service) GetPublicQuotes(tagNames []string) ([]models.Quote, erro
 			subQuery,
 			len(tagNames),
 		).
+		Where("published = true").
 		Find(&quotes); result.Error != nil {
 		return []models.Quote{}, result.Error
 	}
@@ -93,7 +94,6 @@ func (service *Service) PostQuote(postQuoteInput dto.QuoteInput, uid string) (mo
 		Page:      postQuoteInput.Page,
 		Published: postQuoteInput.Published,
 		BookID:    book.ID,
-		Book:      book,
 		UserID:    uid,
 	}
 	if result := service.db.Save(&quote); result.Error != nil {
@@ -152,4 +152,18 @@ func (service *Service) DeleteQuote(id string) (result bool, err error) {
 		return false, result.Error
 	}
 	return true, nil
+}
+
+func (service *Service) AddFavoriteQuote(uid string, id string) (models.User, error) {
+	quote, err := service.GetQuoteById(id)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	user := models.User{ID: uid}
+
+	if err := service.db.Model(&user).Association("Quotes").Append(&quote); err != nil {
+		return models.User{}, err
+	}
+	return user, nil
 }
