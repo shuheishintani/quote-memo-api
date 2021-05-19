@@ -77,6 +77,15 @@ func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]model
 	return quotes, nil
 }
 
+func (service *Service) GetFavoriteQuotes(uid string) ([]models.Quote, error) {
+	user, err := service.GetUser(uid)
+	if err != nil {
+		return []models.Quote{}, err
+	}
+	return user.FavoriteQuotes, nil
+
+}
+
 func (service *Service) PostQuote(postQuoteInput dto.QuoteInput, uid string) (models.Quote, error) {
 	book := models.Book{
 		ISBN:          postQuoteInput.Book.Isbn,

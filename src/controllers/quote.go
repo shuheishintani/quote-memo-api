@@ -39,6 +39,17 @@ func (ctl *Controller) GetPrivateQuotes(c *gin.Context) {
 	c.JSON(http.StatusOK, quotes)
 }
 
+func (ctl *Controller) GetFavoriteQuotes(c *gin.Context) {
+	uid := c.GetString("uid")
+
+	quotes, err := ctl.service.GetFavoriteQuotes(uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, quotes)
+}
+
 func (ctl *Controller) PostQuote(c *gin.Context) {
 	uid := c.GetString("uid")
 
