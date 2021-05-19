@@ -117,3 +117,15 @@ func (ctl *Controller) AddFavoriteQuote(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, user)
 }
+
+func (ctl *Controller) RemoveFavoriteQuote(c *gin.Context) {
+	uid := c.GetString("uid")
+	id := c.Param("id")
+
+	user, err := ctl.service.RemoveFavoriteQuote(uid, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}

@@ -174,3 +174,17 @@ func (service *Service) AddFavoriteQuote(uid string, id string) (models.User, er
 	}
 	return user, nil
 }
+
+func (service *Service) RemoveFavoriteQuote(uid string, id string) (models.User, error) {
+	quote, err := service.GetQuoteById(id)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	user := models.User{ID: uid}
+
+	if err := service.db.Model(&user).Association("FavoriteQuotes").Delete(&quote); err != nil {
+		return models.User{}, err
+	}
+	return user, nil
+}
