@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/shuheishintani/quote-memo-api/src/dto"
@@ -83,7 +84,6 @@ func (service *Service) GetFavoriteQuotes(uid string) ([]models.Quote, error) {
 		return []models.Quote{}, err
 	}
 	return user.FavoriteQuotes, nil
-
 }
 
 func (service *Service) PostQuote(postQuoteInput dto.QuoteInput, uid string) (models.Quote, error) {
@@ -176,11 +176,14 @@ func (service *Service) AddFavoriteQuote(uid string, id string) (models.User, er
 		return models.User{}, err
 	}
 
+	fmt.Printf("%+v", quote)
+
 	user := models.User{ID: uid}
 
 	if err := service.db.Model(&user).Association("FavoriteQuotes").Append(&quote); err != nil {
 		return models.User{}, err
 	}
+
 	return user, nil
 }
 

@@ -24,7 +24,12 @@ func (service *Service) CreateOrUpdateUser(userInput dto.UserInput) (models.User
 func (service *Service) GetUser(uid string) (models.User, error) {
 	fmt.Println(uid)
 	user := models.User{}
-	if result := service.db.Preload(clause.Associations).First(&user, "id = ?", uid); result.Error != nil {
+	if result := service.db.
+		Preload("FavoriteQuotes.Tags").
+		Preload("FavoriteQuotes.Book").
+		Preload("FavoriteQuotes.User").
+		Preload(clause.Associations).
+		First(&user, "id = ?", uid); result.Error != nil {
 		return models.User{}, result.Error
 	}
 	return user, nil
