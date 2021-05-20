@@ -32,6 +32,8 @@ func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 	controller := controllers.NewController(service)
 
 	public := r.Group("/api/public")
+	public.GET("/users", controller.GetUsers)
+	public.GET("/users/:id", controller.GetUserById)
 	public.GET("/external_books", controller.GetExternalBooks)
 	public.GET("/books", controller.GetBooks)
 	public.GET("books/:id", controller.GetBookById)
@@ -44,7 +46,6 @@ func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 	})
 	private.Use(middleware.AuthMiddleware())
 	private.POST("/users", controller.CreateOrUpdateUser)
-	private.GET("/users/:id", controller.GetUserById)
 	private.GET("/users/me", controller.GetMe)
 	private.POST("/quotes", controller.PostQuote)
 	private.GET("/quotes", controller.GetPrivateQuotes)

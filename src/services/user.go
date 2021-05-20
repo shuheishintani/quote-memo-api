@@ -5,7 +5,6 @@ import (
 
 	"github.com/shuheishintani/quote-memo-api/src/dto"
 	"github.com/shuheishintani/quote-memo-api/src/models"
-	"gorm.io/gorm/clause"
 )
 
 func (service *Service) CreateOrUpdateUser(userInput dto.UserInput) (models.User, error) {
@@ -28,7 +27,9 @@ func (service *Service) GetUserById(uid string) (models.User, error) {
 		Preload("FavoriteQuotes.Tags").
 		Preload("FavoriteQuotes.Book").
 		Preload("FavoriteQuotes.User").
-		Preload(clause.Associations).
+		Preload("Quotes", "published IS true").
+		Preload("Quotes.Book").
+		Preload("Quotes.Tags").
 		First(&user, "id = ?", uid); result.Error != nil {
 		return models.User{}, result.Error
 	}
