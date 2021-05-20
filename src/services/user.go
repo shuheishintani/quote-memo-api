@@ -21,7 +21,7 @@ func (service *Service) CreateOrUpdateUser(userInput dto.UserInput) (models.User
 	return user, nil
 }
 
-func (service *Service) GetUser(uid string) (models.User, error) {
+func (service *Service) GetUserById(uid string) (models.User, error) {
 	fmt.Println(uid)
 	user := models.User{}
 	if result := service.db.

@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/shuheishintani/quote-memo-api/src/dto"
+	"github.com/shuheishintani/quote-memo-api/src/models"
 )
 
 type ApiResponse struct {
@@ -62,7 +63,7 @@ type GetBooksQuery struct {
 	Page   string `json:"page"`
 }
 
-func (service *Service) GetBooks(getBooksInput GetBooksQuery) ([]dto.Book, error) {
+func (service *Service) GetExternalBooks(getBooksInput GetBooksQuery) ([]dto.Book, error) {
 	title := getBooksInput.Title
 	author := getBooksInput.Author
 	page := getBooksInput.Page
@@ -108,4 +109,12 @@ func (service *Service) GetBooks(getBooksInput GetBooksQuery) ([]dto.Book, error
 	}
 
 	return books, nil
+}
+
+func (service *Service) GetBook(id string) (models.Book, error) {
+	book := models.Book{}
+	if result := service.db.Preload("Quotes").Preload("Quotes.User").First(&book, id); result.Error != nil {
+		return models.Book{}, result.Error
+	}
+	return book, nil
 }

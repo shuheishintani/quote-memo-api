@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -33,7 +32,8 @@ func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 	controller := controllers.NewController(service)
 
 	public := r.Group("/api/public")
-	public.GET("/books", controller.GetBooks)
+	public.GET("/books", controller.GetExternalBooks)
+	public.GET("books/:id", controller.GetBook)
 	public.GET("/tags", controller.GetTags)
 	public.GET("/quotes", controller.GetPublicQuotes)
 
@@ -43,7 +43,8 @@ func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 	})
 	private.Use(middleware.AuthMiddleware())
 	private.POST("/users", controller.CreateOrUpdateUser)
-	private.GET("/users/me", controller.GetUser)
+	private.GET("/users/:id", controller.GetUserById)
+	private.GET("/users/me", controller.GetMe)
 	private.POST("/quotes", controller.PostQuote)
 	private.GET("/quotes", controller.GetPrivateQuotes)
 	private.GET("/quotes/favorite", controller.GetFavoriteQuotes)
@@ -56,8 +57,6 @@ func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 }
 
 func main() {
-	fmt.Println(os.Getenv("APP_ENV"))
-
 	if os.Getenv("APP_ENV") == "development" {
 		err := godotenv.Load()
 		if err != nil {

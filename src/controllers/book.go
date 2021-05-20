@@ -7,7 +7,7 @@ import (
 	"github.com/shuheishintani/quote-memo-api/src/services"
 )
 
-func (ctl *Controller) GetBooks(c *gin.Context) {
+func (ctl *Controller) GetExternalBooks(c *gin.Context) {
 	title := c.Query("title")
 	author := c.Query("author")
 	page := c.Query("page")
@@ -17,10 +17,20 @@ func (ctl *Controller) GetBooks(c *gin.Context) {
 		Page:   page,
 	}
 
-	books, err := ctl.service.GetBooks(getBooksInput)
+	books, err := ctl.service.GetExternalBooks(getBooksInput)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, books)
+}
+
+func (ctl *Controller) GetBook(c *gin.Context) {
+	id := c.Param("id")
+	book, err := ctl.service.GetBook(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, book)
 }

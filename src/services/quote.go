@@ -79,7 +79,7 @@ func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]model
 }
 
 func (service *Service) GetFavoriteQuotes(uid string) ([]models.Quote, error) {
-	user, err := service.GetUser(uid)
+	user, err := service.GetUserById(uid)
 	if err != nil {
 		return []models.Quote{}, err
 	}

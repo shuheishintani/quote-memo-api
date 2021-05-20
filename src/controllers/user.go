@@ -21,9 +21,19 @@ func (ctl *Controller) CreateOrUpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, tags)
 }
 
-func (ctl *Controller) GetUser(c *gin.Context) {
+func (ctl *Controller) GetMe(c *gin.Context) {
 	uid := c.GetString("uid")
-	user, err := ctl.service.GetUser(uid)
+	user, err := ctl.service.GetUserById(uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
+func (ctl *Controller) GetUserById(c *gin.Context) {
+	id := c.Param("id")
+	user, err := ctl.service.GetUserById(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
