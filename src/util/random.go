@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shuheishintani/quote-memo-api/src/dto"
 	"github.com/shuheishintani/quote-memo-api/src/models"
 )
 
@@ -51,10 +50,10 @@ func RandomUser() models.User {
 	return user
 }
 
-func RandomBook() dto.Book {
-	book := dto.Book{
+func RandomBook() models.Book {
+	book := models.Book{
 		Title:         RandomString(10),
-		Isbn:          RandomStringNumber(10),
+		ISBN:          RandomStringNumber(10),
 		Author:        RandomString(10),
 		Publisher:     RandomString(10),
 		CoverImageUrl: RandomString(10),

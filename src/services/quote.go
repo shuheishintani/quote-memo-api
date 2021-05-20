@@ -88,7 +88,7 @@ func (service *Service) GetFavoriteQuotes(uid string) ([]models.Quote, error) {
 
 func (service *Service) PostQuote(postQuoteInput dto.QuoteInput, uid string) (models.Quote, error) {
 	book := models.Book{
-		ISBN:          postQuoteInput.Book.Isbn,
+		ISBN:          postQuoteInput.Book.ISBN,
 		Title:         postQuoteInput.Book.Title,
 		Author:        postQuoteInput.Book.Author,
 		Publisher:     postQuoteInput.Book.Publisher,

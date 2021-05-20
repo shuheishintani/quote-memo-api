@@ -25,9 +25,18 @@ func (ctl *Controller) GetExternalBooks(c *gin.Context) {
 	c.JSON(http.StatusOK, books)
 }
 
-func (ctl *Controller) GetBook(c *gin.Context) {
+func (ctl *Controller) GetBooks(c *gin.Context) {
+	books, err := ctl.service.GetBooks()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, books)
+}
+
+func (ctl *Controller) GetBookById(c *gin.Context) {
 	id := c.Param("id")
-	book, err := ctl.service.GetBook(id)
+	book, err := ctl.service.GetBookById(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

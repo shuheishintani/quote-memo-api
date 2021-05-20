@@ -34,3 +34,11 @@ func (service *Service) GetUserById(uid string) (models.User, error) {
 	}
 	return user, nil
 }
+
+func (service *Service) GetUsers() ([]models.User, error) {
+	users := []models.User{}
+	if result := service.db.Find(&users); result.Error != nil {
+		return []models.User{}, result.Error
+	}
+	return users, nil
+}

@@ -32,8 +32,9 @@ func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 	controller := controllers.NewController(service)
 
 	public := r.Group("/api/public")
-	public.GET("/books", controller.GetExternalBooks)
-	public.GET("books/:id", controller.GetBook)
+	public.GET("/external_books", controller.GetExternalBooks)
+	public.GET("/books", controller.GetBooks)
+	public.GET("books/:id", controller.GetBookById)
 	public.GET("/tags", controller.GetTags)
 	public.GET("/quotes", controller.GetPublicQuotes)
 

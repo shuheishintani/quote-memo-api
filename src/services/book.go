@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/shuheishintani/quote-memo-api/src/dto"
 	"github.com/shuheishintani/quote-memo-api/src/models"
 )
 
@@ -63,7 +62,7 @@ type GetBooksQuery struct {
 	Page   string `json:"page"`
 }
 
-func (service *Service) GetExternalBooks(getBooksInput GetBooksQuery) ([]dto.Book, error) {
+func (service *Service) GetExternalBooks(getBooksInput GetBooksQuery) ([]models.Book, error) {
 	title := getBooksInput.Title
 	author := getBooksInput.Author
 	page := getBooksInput.Page
@@ -76,30 +75,30 @@ func (service *Service) GetExternalBooks(getBooksInput GetBooksQuery) ([]dto.Boo
 	} else if author != "" {
 		url += fmt.Sprintf("&&author=%s&page=%s", author, page)
 	} else {
-		return []dto.Book{}, errors.New("parameters is not valid")
+		return []models.Book{}, errors.New("parameters is not valid")
 	}
 
 	resp, err := http.Get(url)
 	if err != nil {
-		return []dto.Book{}, err
+		return []models.Book{}, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return []dto.Book{}, err
+		return []models.Book{}, err
 	}
 
 	var data ApiResponse
 	if err := json.Unmarshal(body, &data); err != nil {
-		return []dto.Book{}, err
+		return []models.Book{}, err
 	}
 
-	books := []dto.Book{}
+	books := []models.Book{}
 
 	for _, item := range data.Items {
-		book := dto.Book{
-			Isbn:          item.Item.Isbn,
+		book := models.Book{
+			ISBN:          item.Item.Isbn,
 			Title:         item.Item.Title,
 			Author:        item.Item.Author,
 			Publisher:     item.Item.Publishername,
@@ -111,9 +110,21 @@ func (service *Service) GetExternalBooks(getBooksInput GetBooksQuery) ([]dto.Boo
 	return books, nil
 }
 
-func (service *Service) GetBook(id string) (models.Book, error) {
+func (service *Service) GetBooks() ([]models.Book, error) {
+	books := []models.Book{}
+	if result := service.db.Find(&books); result.Error != nil {
+		return []models.Book{}, result.Error
+	}
+	return books, nil
+}
+
+func (service *Service) GetBookById(id string) (models.Book, error) {
 	book := models.Book{}
-	if result := service.db.Preload("Quotes").Preload("Quotes.User").First(&book, id); result.Error != nil {
+	if result := service.db.
+		Preload("Quotes", "published IS true").
+		Preload("Quotes.User").
+		Preload("Quotes.Tags").
+		First(&book, id); result.Error != nil {
 		return models.Book{}, result.Error
 	}
 	return book, nil

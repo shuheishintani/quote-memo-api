@@ -40,3 +40,12 @@ func (ctl *Controller) GetUserById(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, user)
 }
+
+func (ctl *Controller) GetUsers(c *gin.Context) {
+	users, err := ctl.service.GetUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, users)
+}
