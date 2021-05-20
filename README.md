@@ -2,7 +2,7 @@
 
 ## 使用技術
 
-![代替テキスト](./quote-memo-final.png)
+![代替テキスト](./architecture.png)
 
 ## ER図
 
