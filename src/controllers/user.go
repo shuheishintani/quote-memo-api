@@ -49,3 +49,18 @@ func (ctl *Controller) GetUsers(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, users)
 }
+
+func (ctl *Controller) DeleteUser(c *gin.Context) {
+	uid := c.GetString("uid")
+	_, err := ctl.service.GetUserById(uid)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	result, err := ctl.service.DeleteUser(uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}

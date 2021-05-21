@@ -5,6 +5,7 @@ import (
 
 	"github.com/shuheishintani/quote-memo-api/src/dto"
 	"github.com/shuheishintani/quote-memo-api/src/models"
+	"gorm.io/gorm/clause"
 )
 
 func (service *Service) CreateOrUpdateUser(userInput dto.UserInput) (models.User, error) {
@@ -42,4 +43,20 @@ func (service *Service) GetUsers() ([]models.User, error) {
 		return []models.User{}, result.Error
 	}
 	return users, nil
+}
+
+func (service *Service) DeleteUser(uid string) (bool, error) {
+	quotes, err := service.GetPrivateQuotes([]string{}, uid, 0, 10000)
+	if err != nil {
+		return false, err
+	}
+
+	if result := service.db.Select(clause.Associations).Delete(&quotes); result.Error != nil {
+		return false, result.Error
+	}
+
+	if result := service.db.Select(clause.Associations).Delete(&models.User{ID: uid}); result.Error != nil {
+		return false, result.Error
+	}
+	return true, nil
 }

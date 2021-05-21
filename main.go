@@ -47,6 +47,7 @@ func setRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 	private.Use(middleware.AuthMiddleware())
 	private.POST("/users", controller.CreateOrUpdateUser)
 	private.GET("/users/me", controller.GetMe)
+	private.DELETE("/users", controller.DeleteUser)
 	private.POST("/quotes", controller.PostQuote)
 	private.GET("/quotes", controller.GetPrivateQuotes)
 	private.GET("/quotes/favorite", controller.GetFavoriteQuotes)

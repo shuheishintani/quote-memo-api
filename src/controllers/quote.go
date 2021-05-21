@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -71,11 +72,13 @@ func (ctl *Controller) PostQuote(c *gin.Context) {
 
 	postQuoteInput := dto.QuoteInput{}
 	if err := c.BindJSON(&postQuoteInput); err != nil {
+
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	if err := ctl.validator.Struct(postQuoteInput); err != nil {
+		fmt.Println(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

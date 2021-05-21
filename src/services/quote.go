@@ -173,13 +173,9 @@ func (service *Service) UpdateQuote(updateQuoteInput dto.QuoteInput, id string) 
 	return updated, nil
 }
 
-func (service *Service) DeleteQuote(id string) (result bool, err error) {
+func (service *Service) DeleteQuote(id string) (bool, error) {
 	i, err := strconv.Atoi(id)
 	if err != nil {
-		return false, err
-	}
-
-	if err := service.db.Model(&models.Quote{ID: i}).Association("FavoriteUsers").Clear(); err != nil {
 		return false, err
 	}
 
