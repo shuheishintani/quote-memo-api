@@ -51,7 +51,7 @@ func TestGetQuotes(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	result, err := s.GetPrivateQuotes([]string{tag1.Name, tag2.Name, tag3.Name}, user.ID)
+	result, err := s.GetPrivateQuotes([]string{tag1.Name, tag2.Name, tag3.Name}, user.ID, 0, 5)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,15 @@ func (ctl *Controller) GetPublicQuotes(c *gin.Context) {
 	if strTags != "" {
 		tagNames = strings.Split(strTags, ",")
 	}
-	quotes, err := ctl.service.GetPublicQuotes(tagNames)
+
+	page := c.Query("page")
+	i, err := strconv.Atoi(page)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	quotes, err := ctl.service.GetPublicQuotes(tagNames, 5*(i-1), 5)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -31,7 +40,14 @@ func (ctl *Controller) GetPrivateQuotes(c *gin.Context) {
 		tagNames = strings.Split(strTags, ",")
 	}
 
-	quotes, err := ctl.service.GetPrivateQuotes(tagNames, uid)
+	page := c.Query("page")
+	i, err := strconv.Atoi(page)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	quotes, err := ctl.service.GetPrivateQuotes(tagNames, uid, 5*(i-1), 5)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -9,11 +9,16 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func (service *Service) GetPublicQuotes(tagNames []string) ([]models.Quote, error) {
+func (service *Service) GetPublicQuotes(tagNames []string, offset int, limit int) ([]models.Quote, error) {
 	quotes := []models.Quote{}
 
 	if len(tagNames) == 0 {
-		if result := service.db.Preload(clause.Associations).Where("published = true").Find(&quotes); result.Error != nil {
+		if result := service.db.
+			Preload(clause.Associations).
+			Where("published = true").
+			Offset(offset).
+			Limit(limit).
+			Find(&quotes); result.Error != nil {
 			return []models.Quote{}, result.Error
 		}
 		return quotes, nil
@@ -26,13 +31,16 @@ func (service *Service) GetPublicQuotes(tagNames []string) ([]models.Quote, erro
 		Where("t.name IN (?)", tagNames).
 		Group("quote_id")
 
-	if result := service.db.Preload(clause.Associations).
+	if result := service.db.
+		Preload(clause.Associations).
 		Joins(
 			"JOIN (?) AS matched ON quote_id = quotes.id AND matched.count = ?",
 			subQuery,
 			len(tagNames),
 		).
 		Where("published = true").
+		Offset(offset).
+		Limit(limit).
 		Find(&quotes); result.Error != nil {
 		return []models.Quote{}, result.Error
 	}
@@ -48,11 +56,18 @@ func (s *Service) GetQuoteById(id string) (models.Quote, error) {
 	return quote, nil
 }
 
-func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]models.Quote, error) {
+func (service *Service) GetPrivateQuotes(tagNames []string, uid string, offset int, limit int) ([]models.Quote, error) {
 	quotes := []models.Quote{}
 
 	if len(tagNames) == 0 {
-		if result := service.db.Preload("Tags").Preload("Book").Where("user_id = ?", uid).Find(&quotes); result.Error != nil {
+		if result := service.db.
+			Preload("Tags").
+			Preload("Book").
+			Where("user_id = ?", uid).
+			Order("created_at desc").
+			Offset(offset).
+			Limit(limit).
+			Find(&quotes); result.Error != nil {
 			return []models.Quote{}, result.Error
 		}
 		return quotes, nil
@@ -65,13 +80,17 @@ func (service *Service) GetPrivateQuotes(tagNames []string, uid string) ([]model
 		Where("t.name IN (?)", tagNames).
 		Group("quote_id")
 
-	if result := service.db.Preload(clause.Associations).
+	if result := service.db.
+		Preload(clause.Associations).
 		Joins(
 			"JOIN (?) AS matched ON quote_id = quotes.id AND matched.count = ?",
 			subQuery,
 			len(tagNames),
 		).
 		Where("user_id = ?", uid).
+		Order("created_at desc").
+		Offset(offset).
+		Limit(limit).
 		Find(&quotes); result.Error != nil {
 		return []models.Quote{}, result.Error
 	}
