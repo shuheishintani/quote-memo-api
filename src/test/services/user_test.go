@@ -49,10 +49,10 @@ func TestCreateOrUpdateUser(t *testing.T) {
 		updateResult, err := s.CreateOrUpdateUser(updatedUser)
 		assert.NoError(t, err)
 		assert.NotNil(t, updateResult)
+		assert.Equal(t, createResult.ID, updateResult.ID)
 		assert.Equal(t, updatedUser.Username, updateResult.Username)
 		assert.Equal(t, updatedUser.ProfileImageUrl, updateResult.ProfileImageUrl)
 		assert.Equal(t, updatedUser.Provider, updateResult.Provider)
 		assert.Equal(t, updatedUser.Username, updateResult.Username)
 	})
-
 }
