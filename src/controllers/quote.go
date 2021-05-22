@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shuheishintani/quote-memo-api/src/dto"
+	"github.com/shuheishintani/quote-memo-api/src/models"
 )
 
 func (ctl *Controller) GetPublicQuotes(c *gin.Context) {
@@ -70,7 +70,7 @@ func (ctl *Controller) GetFavoriteQuotes(c *gin.Context) {
 func (ctl *Controller) PostQuote(c *gin.Context) {
 	uid := c.GetString("uid")
 
-	postQuoteInput := dto.QuoteInput{}
+	postQuoteInput := models.Quote{}
 	if err := c.BindJSON(&postQuoteInput); err != nil {
 
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -105,7 +105,7 @@ func (ctl *Controller) UpdateQuote(c *gin.Context) {
 		return
 	}
 
-	updateQuoteInput := dto.QuoteInput{}
+	updateQuoteInput := models.Quote{}
 	if err := c.BindJSON(&updateQuoteInput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

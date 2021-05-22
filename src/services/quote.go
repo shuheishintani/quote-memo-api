@@ -1,13 +1,47 @@
 package services
 
 import (
-	"fmt"
 	"strconv"
 
-	"github.com/shuheishintani/quote-memo-api/src/dto"
 	"github.com/shuheishintani/quote-memo-api/src/models"
 	"gorm.io/gorm/clause"
 )
+
+func (service *Service) PostQuote(postQuoteInput models.Quote, uid string) (models.Quote, error) {
+	book := models.Book{
+		ISBN:          postQuoteInput.Book.ISBN,
+		Title:         postQuoteInput.Book.Title,
+		Author:        postQuoteInput.Book.Author,
+		Publisher:     postQuoteInput.Book.Publisher,
+		CoverImageUrl: postQuoteInput.Book.CoverImageUrl,
+	}
+	if result := service.db.Where(book).FirstOrCreate(&book); result.Error != nil {
+		return models.Quote{}, result.Error
+	}
+
+	quote := models.Quote{
+		Text:      postQuoteInput.Text,
+		Page:      postQuoteInput.Page,
+		Published: postQuoteInput.Published,
+		BookID:    book.ID,
+		Book:      book,
+		UserID:    uid,
+	}
+	if result := service.db.Save(&quote); result.Error != nil {
+		return models.Quote{}, result.Error
+	}
+
+	for _, tag := range postQuoteInput.Tags {
+		if result := service.db.Where(tag).FirstOrCreate(&tag); result.Error != nil {
+			return models.Quote{}, result.Error
+		}
+		if err := service.db.Model(&quote).Association("Tags").Append(&tag); err != nil {
+			return models.Quote{}, err
+		}
+	}
+
+	return quote, nil
+}
 
 func (service *Service) GetPublicQuotes(tagNames []string, offset int, limit int) ([]models.Quote, error) {
 	quotes := []models.Quote{}
@@ -46,14 +80,6 @@ func (service *Service) GetPublicQuotes(tagNames []string, offset int, limit int
 	}
 	return quotes, nil
 
-}
-
-func (s *Service) GetQuoteById(id string) (models.Quote, error) {
-	quote := models.Quote{}
-	if result := s.db.Preload("Tags").Preload("Book").First(&quote, id); result.Error != nil {
-		return models.Quote{}, result.Error
-	}
-	return quote, nil
 }
 
 func (service *Service) GetPrivateQuotes(tagNames []string, uid string, offset int, limit int) ([]models.Quote, error) {
@@ -105,43 +131,15 @@ func (service *Service) GetFavoriteQuotes(uid string) ([]models.Quote, error) {
 	return user.FavoriteQuotes, nil
 }
 
-func (service *Service) PostQuote(postQuoteInput dto.QuoteInput, uid string) (models.Quote, error) {
-	book := models.Book{
-		ISBN:          postQuoteInput.Book.ISBN,
-		Title:         postQuoteInput.Book.Title,
-		Author:        postQuoteInput.Book.Author,
-		Publisher:     postQuoteInput.Book.Publisher,
-		CoverImageUrl: postQuoteInput.Book.CoverImageUrl,
-	}
-	if result := service.db.Where(book).FirstOrCreate(&book); result.Error != nil {
+func (s *Service) GetQuoteById(id string) (models.Quote, error) {
+	quote := models.Quote{}
+	if result := s.db.Preload("Tags").Preload("Book").First(&quote, id); result.Error != nil {
 		return models.Quote{}, result.Error
 	}
-
-	quote := models.Quote{
-		Text:      postQuoteInput.Text,
-		Page:      postQuoteInput.Page,
-		Published: postQuoteInput.Published,
-		BookID:    book.ID,
-		Book:      book,
-		UserID:    uid,
-	}
-	if result := service.db.Save(&quote); result.Error != nil {
-		return models.Quote{}, result.Error
-	}
-
-	for _, tag := range postQuoteInput.Tags {
-		if result := service.db.Where(tag).FirstOrCreate(&tag); result.Error != nil {
-			return models.Quote{}, result.Error
-		}
-		if err := service.db.Model(&quote).Association("Tags").Append(&tag); err != nil {
-			return models.Quote{}, err
-		}
-	}
-
 	return quote, nil
 }
 
-func (service *Service) UpdateQuote(updateQuoteInput dto.QuoteInput, id string) (models.Quote, error) {
+func (service *Service) UpdateQuote(updateQuoteInput models.Quote, id string) (models.Quote, error) {
 	if result := service.db.Model(&models.Quote{}).Where("id = ?", id).Updates(map[string]interface{}{
 		"Text":      updateQuoteInput.Text,
 		"Page":      updateQuoteInput.Page,
@@ -163,7 +161,6 @@ func (service *Service) UpdateQuote(updateQuoteInput dto.QuoteInput, id string) 
 		if err := service.db.Model(&models.Quote{ID: i}).Association("Tags").Append(&tag); err != nil {
 			return models.Quote{}, err
 		}
-
 	}
 
 	updated, err := service.GetQuoteById(id)
@@ -190,8 +187,6 @@ func (service *Service) AddFavoriteQuote(uid string, id string) (models.User, er
 	if err != nil {
 		return models.User{}, err
 	}
-
-	fmt.Printf("%+v", quote)
 
 	user := models.User{ID: uid}
 

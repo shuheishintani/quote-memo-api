@@ -3,12 +3,11 @@ package services
 import (
 	"fmt"
 
-	"github.com/shuheishintani/quote-memo-api/src/dto"
 	"github.com/shuheishintani/quote-memo-api/src/models"
 	"gorm.io/gorm/clause"
 )
 
-func (service *Service) CreateOrUpdateUser(userInput dto.UserInput) (models.User, error) {
+func (service *Service) CreateOrUpdateUser(userInput models.User) (models.User, error) {
 	user := models.User{
 		ID:              userInput.ID,
 		Username:        userInput.Username,

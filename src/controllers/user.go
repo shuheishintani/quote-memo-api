@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shuheishintani/quote-memo-api/src/dto"
+	"github.com/shuheishintani/quote-memo-api/src/models"
 )
 
 func (ctl *Controller) CreateOrUpdateUser(c *gin.Context) {
-	userInput := dto.UserInput{}
+	userInput := models.User{}
 	if err := c.BindJSON(&userInput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

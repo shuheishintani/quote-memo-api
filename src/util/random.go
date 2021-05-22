@@ -40,6 +40,10 @@ func RandomStringNumber(n int) string {
 	return sb.String()
 }
 
+func RandomBool() bool {
+	return rand.Intn(2) == 1
+}
+
 func RandomUser() models.User {
 	user := models.User{
 		ID:              RandomString(10),
@@ -66,4 +70,29 @@ func RandomTag() models.Tag {
 		Name: RandomString(6),
 	}
 	return tag
+}
+
+func RandomQuote(uid string, published bool) models.Quote {
+	quote := models.Quote{
+		Text:      RandomString(10),
+		Page:      RandomInt(1, 500),
+		Published: published,
+		Book:      RandomBook(),
+		Tags:      []models.Tag{RandomTag(), RandomTag(), RandomTag()},
+		UserID:    uid,
+	}
+	return quote
+}
+
+func IncompleteRandomQuote(uid string, published bool, book models.Book, tags []models.Tag) models.Quote {
+	quote := models.Quote{
+		Text:      RandomString(10),
+		Page:      RandomInt(1, 500),
+		Published: published,
+		BookID:    book.ID,
+		Book:      book,
+		Tags:      tags,
+		UserID:    uid,
+	}
+	return quote
 }

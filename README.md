@@ -1,13 +1,15 @@
 # QuoteMemo
 
+## 概要
+
+QuoteMemoは書籍の引用を管理・シェアできるWebサービスです。
+
 ## デモページ
 [https://quote-memo-client.vercel.app](https://quote-memo-client.vercel.app)
 
 ※サーバー停止中
 
-## 概要
 
-QuoteMemoは書籍の引用を管理・シェアできるWebサービスです。
 
 ## 使用技術
 
@@ -44,7 +46,7 @@ QuoteMemoは書籍の引用を管理・シェアできるWebサービスです�
 
 ## ER図
 
-![data-model](./data-model.png)
+<img src="./data-model.png" width="800px" height="600px">
 
 ## 機能一覧
 - Twitterログイン
