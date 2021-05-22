@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func gormConnectForTesting() (*gorm.DB, error) {
+func GormConnectForTesting() (*gorm.DB, error) {
 	dsn := "host=127.0.0.1 port=5431 user=postgres password=postgres dbname=postgres sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn))
 	if err != nil {

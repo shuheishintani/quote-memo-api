@@ -12,7 +12,7 @@ import (
 )
 
 func TestGetTags(t *testing.T) {
-	db, err := gormConnectForTesting()
+	db, err := GormConnectForTesting()
 	if err != nil {
 		log.Fatal("Failed to connect gorm database: ", err)
 	}

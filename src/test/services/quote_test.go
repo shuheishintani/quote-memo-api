@@ -12,7 +12,7 @@ import (
 )
 
 func TestPostQuote(t *testing.T) {
-	db, err := gormConnectForTesting()
+	db, err := GormConnectForTesting()
 	if err != nil {
 		log.Fatal("Failed to connect gorm database: ", err)
 	}
@@ -71,7 +71,7 @@ func TestPostQuote(t *testing.T) {
 }
 
 func TestGetPublicQuotes(t *testing.T) {
-	db, err := gormConnectForTesting()
+	db, err := GormConnectForTesting()
 	if err != nil {
 		log.Fatal("Failed to connect gorm database: ", err)
 	}
@@ -164,7 +164,7 @@ func TestGetPublicQuotes(t *testing.T) {
 }
 
 func TestGetQuotes(t *testing.T) {
-	db, err := gormConnectForTesting()
+	db, err := GormConnectForTesting()
 	if err != nil {
 		log.Fatal("Failed to connect gorm database: ", err)
 	}
@@ -262,7 +262,7 @@ func TestGetQuotes(t *testing.T) {
 }
 
 func TestGetFavoriteQuotes(t *testing.T) {
-	db, err := gormConnectForTesting()
+	db, err := GormConnectForTesting()
 	if err != nil {
 		log.Fatal("Failed to connect gorm database: ", err)
 	}
@@ -326,7 +326,7 @@ func TestGetFavoriteQuotes(t *testing.T) {
 }
 
 func TestGetQuoteById(t *testing.T) {
-	db, err := gormConnectForTesting()
+	db, err := GormConnectForTesting()
 	if err != nil {
 		log.Fatal("Failed to connect gorm database: ", err)
 	}
@@ -383,7 +383,7 @@ func TestGetQuoteById(t *testing.T) {
 }
 
 func TestUpdateQuote(t *testing.T) {
-	db, err := gormConnectForTesting()
+	db, err := GormConnectForTesting()
 	if err != nil {
 		log.Fatal("Failed to connect gorm database: ", err)
 	}
@@ -437,7 +437,7 @@ func TestUpdateQuote(t *testing.T) {
 }
 
 func TestDeleteQuote(t *testing.T) {
-	db, err := gormConnectForTesting()
+	db, err := GormConnectForTesting()
 	if err != nil {
 		log.Fatal("Failed to connect gorm database: ", err)
 	}
@@ -469,7 +469,7 @@ func TestDeleteQuote(t *testing.T) {
 	notFoundResult := db.First(&models.Quote{}, quote.ID)
 
 	assert.Error(t, notFoundResult.Error)
-	assert.Equal(t, notFoundResult.Error.Error(), "record not found")
+	assert.Equal(t, "record not found", notFoundResult.Error.Error())
 	assert.NoError(t, err)
 	assert.NotNil(t, deleteResult)
 	assert.Equal(t, true, deleteResult)
@@ -483,7 +483,7 @@ func TestDeleteQuote(t *testing.T) {
 }
 
 func TestAddFavoriteQuote(t *testing.T) {
-	db, err := gormConnectForTesting()
+	db, err := GormConnectForTesting()
 	if err != nil {
 		log.Fatal("Failed to connect gorm database: ", err)
 	}
@@ -496,14 +496,18 @@ func TestAddFavoriteQuote(t *testing.T) {
 
 	s := services.NewService(db)
 
-	user := util.RandomUser()
-	db.Create(&user)
+	user1 := util.RandomUser()
+	user2 := util.RandomUser()
+	users := []models.User{
+		user1, user2,
+	}
+	db.Create(&users)
 
-	quote := util.RandomQuote(user.ID, true)
+	quote := util.RandomQuote(users[0].ID, true)
 	db.Create(&quote)
 
 	strID := strconv.Itoa(quote.ID)
-	result, err := s.AddFavoriteQuote(user.ID, strID)
+	result, err := s.AddFavoriteQuote(users[1].ID, strID)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
@@ -514,6 +518,7 @@ func TestAddFavoriteQuote(t *testing.T) {
 	assert.Equal(t, quote.Published, result.FavoriteQuotes[0].Published)
 	assert.Equal(t, quote.Book.Title, result.FavoriteQuotes[0].Book.Title)
 	assert.Equal(t, quote.Tags[0].Name, result.FavoriteQuotes[0].Tags[0].Name)
+	assert.Equal(t, users[0].ID, result.FavoriteQuotes[0].UserID)
 
 	db.Migrator().DropTable("quotes_tags")
 	db.Migrator().DropTable("users_quotes")
@@ -524,7 +529,7 @@ func TestAddFavoriteQuote(t *testing.T) {
 }
 
 func TestRemoveFavoriteQuote(t *testing.T) {
-	db, err := gormConnectForTesting()
+	db, err := GormConnectForTesting()
 	if err != nil {
 		log.Fatal("Failed to connect gorm database: ", err)
 	}
@@ -537,16 +542,20 @@ func TestRemoveFavoriteQuote(t *testing.T) {
 
 	s := services.NewService(db)
 
-	user := util.RandomUser()
-	db.Create(&user)
+	user1 := util.RandomUser()
+	user2 := util.RandomUser()
+	users := []models.User{
+		user1, user2,
+	}
+	db.Create(&users)
 
-	quote := util.RandomQuote(user.ID, true)
+	quote := util.RandomQuote(users[0].ID, true)
 	db.Create(&quote)
 
-	db.Model(&user).Association("FavoriteQuotes").Append(&quote)
+	db.Model(&users[1]).Association("FavoriteQuotes").Append(&quote)
 
 	strID := strconv.Itoa(quote.ID)
-	result, err := s.RemoveFavoriteQuote(user.ID, strID)
+	result, err := s.RemoveFavoriteQuote(users[1].ID, strID)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
