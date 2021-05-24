@@ -50,6 +50,7 @@ func (service *Service) GetPublicQuotes(tagNames []string, offset int, limit int
 		if result := service.db.
 			Preload(clause.Associations).
 			Where("published = true").
+			Order("created_at desc").
 			Offset(offset).
 			Limit(limit).
 			Find(&quotes); result.Error != nil {
@@ -73,6 +74,7 @@ func (service *Service) GetPublicQuotes(tagNames []string, offset int, limit int
 			len(tagNames),
 		).
 		Where("published = true").
+		Order("created_at desc").
 		Offset(offset).
 		Limit(limit).
 		Find(&quotes); result.Error != nil {
@@ -150,6 +152,10 @@ func (service *Service) UpdateQuote(updateQuoteInput models.Quote, id string) (m
 
 	i, err := strconv.Atoi(id)
 	if err != nil {
+		return models.Quote{}, err
+	}
+
+	if err := service.db.Model(&models.Quote{ID: i}).Association("Tags").Clear(); err != nil {
 		return models.Quote{}, err
 	}
 

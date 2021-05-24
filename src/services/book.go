@@ -110,9 +110,21 @@ func (service *Service) GetExternalBooks(getBooksInput GetBooksQuery) ([]models.
 	return books, nil
 }
 
-func (service *Service) GetBooks() ([]models.Book, error) {
+func (service *Service) GetBooks(keyword string) ([]models.Book, error) {
 	books := []models.Book{}
-	if result := service.db.Find(&books); result.Error != nil {
+
+	if keyword == "" {
+		if result := service.db.Preload("Quotes", "published IS true").Find(&books); result.Error != nil {
+			return []models.Book{}, result.Error
+		}
+		return books, nil
+	}
+
+	if result := service.db.
+		Preload("Quotes", "published IS true").
+		Where("title like ?", "%"+keyword+"%").
+		Or("author like ?", "%"+keyword+"%").
+		Find(&books); result.Error != nil {
 		return []models.Book{}, result.Error
 	}
 	return books, nil

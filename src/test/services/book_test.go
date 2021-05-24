@@ -33,7 +33,7 @@ func TestGetBooks(t *testing.T) {
 	}
 	db.Create(&books)
 
-	result, err := s.GetBooks()
+	result, err := s.GetBooks("")
 
 	assert.NoError(t, err)
 	assert.NotNil(t, result)

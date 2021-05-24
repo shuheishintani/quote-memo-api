@@ -24,7 +24,7 @@ func (ctl *Controller) GetPublicQuotes(c *gin.Context) {
 		return
 	}
 
-	quotes, err := ctl.service.GetPublicQuotes(tagNames, 5*(i-1), 5)
+	quotes, err := ctl.service.GetPublicQuotes(tagNames, 10*(i-1), 10)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -48,7 +48,7 @@ func (ctl *Controller) GetPrivateQuotes(c *gin.Context) {
 		return
 	}
 
-	quotes, err := ctl.service.GetPrivateQuotes(tagNames, uid, 5*(i-1), 5)
+	quotes, err := ctl.service.GetPrivateQuotes(tagNames, uid, 10*(i-1), 10)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -72,7 +72,6 @@ func (ctl *Controller) PostQuote(c *gin.Context) {
 
 	postQuoteInput := models.Quote{}
 	if err := c.BindJSON(&postQuoteInput); err != nil {
-
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

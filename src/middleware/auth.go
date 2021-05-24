@@ -2,9 +2,7 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"strings"
 
 	"firebase.google.com/go/v4/auth"
 	"github.com/gin-gonic/gin"
@@ -13,22 +11,18 @@ import (
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := c.MustGet("auth").(*auth.Client)
-		authorizationToken := c.GetHeader("Authorization")
-		idToken := strings.TrimSpace(strings.Replace(authorizationToken, "Bearer", "", 1))
-		if idToken == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Id token is not available"})
-			c.Abort()
+		cookie, err := c.Cookie("session")
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			return
+		}
+		decoded, err := auth.VerifySessionCookieAndCheckRevoked(context.Background(), cookie)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}
 
-		token, err := auth.VerifyIDToken(context.Background(), idToken)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-			c.Abort()
-			return
-		}
-		c.Set("uid", token.UID)
-		fmt.Println(token.UID)
+		c.Set("uid", decoded.UID)
 		c.Next()
 	}
 }

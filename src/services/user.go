@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/shuheishintani/quote-memo-api/src/models"
 	"gorm.io/gorm/clause"
 )
@@ -21,7 +19,6 @@ func (service *Service) CreateOrUpdateUser(userInput models.User) (models.User, 
 }
 
 func (service *Service) GetUserById(uid string) (models.User, error) {
-	fmt.Println(uid)
 	user := models.User{}
 	if result := service.db.
 		Preload("FavoriteQuotes.Tags").

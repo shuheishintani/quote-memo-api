@@ -26,7 +26,8 @@ func (ctl *Controller) GetExternalBooks(c *gin.Context) {
 }
 
 func (ctl *Controller) GetBooks(c *gin.Context) {
-	books, err := ctl.service.GetBooks()
+	keyword := c.Query("keyword")
+	books, err := ctl.service.GetBooks(keyword)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
