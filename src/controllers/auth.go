@@ -32,3 +32,8 @@ func (ctl *Controller) Login(c *gin.Context) {
 	c.SetCookie("session", cookie, int(expiresIn.Seconds()), "/", "", false, true)
 	c.JSON(http.StatusOK, gin.H{"status": "success"})
 }
+
+func (ctl *Controller) Logout(c *gin.Context) {
+	c.SetCookie("session", "", 0, "", "", false, true)
+	c.JSON(http.StatusOK, gin.H{"status": "success"})
+}

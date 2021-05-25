@@ -47,7 +47,7 @@ func (service *Service) DeleteUser(uid string) (bool, error) {
 		return false, err
 	}
 
-	if result := service.db.Select(clause.Associations).Delete(&quotes); result.Error != nil {
+	if result := service.db.Select(clause.Associations).Where("user_id = ?", uid).Delete(&quotes); result.Error != nil {
 		return false, result.Error
 	}
 

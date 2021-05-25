@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"firebase.google.com/go/v4/auth"
@@ -21,6 +22,8 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}
+
+		fmt.Println(decoded.UID)
 
 		c.Set("uid", decoded.UID)
 		c.Next()

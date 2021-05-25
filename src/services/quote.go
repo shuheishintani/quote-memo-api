@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/shuheishintani/quote-memo-api/src/models"
@@ -123,6 +124,60 @@ func (service *Service) GetPrivateQuotes(tagNames []string, uid string, offset i
 		return []models.Quote{}, result.Error
 	}
 	return quotes, nil
+}
+
+type QuoteForExport struct {
+	ID   int           `gorm:"primary_key" json:"id"`
+	Text string        `json:"text"`
+	Page int           `json:"page"`
+	Book BookForExport `json:"book"`
+	Tags []string      `json:"tags"`
+}
+
+type BookForExport struct {
+	ISBN      string `json:"isbn"`
+	Title     string `json:"title"`
+	Author    string `json:"author"`
+	Publisher string `json:"publisher"`
+}
+
+func (service *Service) GetPrivateQuotesForExport(uid string) ([]QuoteForExport, error) {
+	quotes := []models.Quote{}
+
+	if result := service.db.
+		Preload("Book").
+		Preload("Tags").
+		Order("created_at desc").
+		Find(&quotes); result.Error != nil {
+		return []QuoteForExport{}, result.Error
+	}
+
+	quotesForExport := []QuoteForExport{}
+
+	for _, quote := range quotes {
+		tagsForExport := []string{}
+
+		for _, tag := range quote.Tags {
+			tagsForExport = append(tagsForExport, tag.Name)
+		}
+
+		quotesForExport = append(quotesForExport, QuoteForExport{
+			ID:   quote.ID,
+			Text: quote.Text,
+			Page: quote.Page,
+			Book: BookForExport{
+				ISBN:      quote.Book.ISBN,
+				Title:     quote.Book.Title,
+				Author:    quote.Book.Author,
+				Publisher: quote.Book.Publisher,
+			},
+			Tags: tagsForExport,
+		})
+	}
+
+	fmt.Printf("%+v", quotesForExport)
+
+	return quotesForExport, nil
 }
 
 func (service *Service) GetFavoriteQuotes(uid string) ([]models.Quote, error) {

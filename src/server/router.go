@@ -42,47 +42,20 @@ func SetRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 	api.GET("/quotes", controller.GetPublicQuotes)
 	api.GET("/quotes/me", middleware.AuthMiddleware(), controller.GetPrivateQuotes)
 	api.GET("/quotes/my_favorite", middleware.AuthMiddleware(), controller.GetFavoriteQuotes)
+	api.GET("/quotes/for_export", middleware.AuthMiddleware(), controller.GetPrivateQuotesForExport)
 	api.PUT("/quotes/:id", middleware.AuthMiddleware(), controller.UpdateQuote)
 	api.DELETE("/quotes/:id", middleware.AuthMiddleware(), controller.DeleteQuote)
 	api.PUT("/quotes/:id/like", middleware.AuthMiddleware(), controller.AddFavoriteQuote)
 	api.PUT("/quotes/:id/unlike", middleware.AuthMiddleware(), controller.RemoveFavoriteQuote)
 
-	api.GET("/external_books", controller.GetExternalBooks)
 	api.GET("/books", controller.GetBooks)
 	api.GET("books/:id", controller.GetBookById)
+	api.GET("/external_books", controller.GetExternalBooks)
 
 	api.GET("/tags", controller.GetTags)
 
 	api.POST("/auth/login", controller.Login)
-
-	// public := r.Group("/api/public")
-	// public.Use(func(c *gin.Context) {
-	// 	c.Set("auth", auth)
-	// })
-	// public.GET("/users", controller.GetUsers)
-	// public.GET("/users/:id", controller.GetUserById)
-	// public.GET("/external_books", controller.GetExternalBooks)
-	// public.GET("/books", controller.GetBooks)
-	// public.GET("books/:id", controller.GetBookById)
-	// public.GET("/tags", controller.GetTags)
-	// public.GET("/quotes", controller.GetPublicQuotes)
-	// public.POST("/auth/login", controller.Login)
-
-	// private := r.Group("/api")
-	// private.Use(func(c *gin.Context) {
-	// 	c.Set("auth", auth)
-	// })
-	// private.Use(middleware.AuthMiddleware())
-	// private.POST("/users", controller.CreateOrUpdateUser)
-	// private.GET("/users/me", controller.GetMe)
-	// private.DELETE("/users", controller.DeleteUser)
-	// private.POST("/quotes", controller.PostQuote)
-	// private.GET("/quotes", controller.GetPrivateQuotes)
-	// private.GET("/quotes/favorite", controller.GetFavoriteQuotes)
-	// private.PUT("/quotes/:id", controller.UpdateQuote)
-	// private.DELETE("/quotes/:id", controller.DeleteQuote)
-	// private.PUT("/quotes/:id/like", controller.AddFavoriteQuote)
-	// private.PUT("/quotes/:id/unlike", controller.RemoveFavoriteQuote)
+	api.POST("/auth/logout", controller.Logout)
 
 	return r
 }
