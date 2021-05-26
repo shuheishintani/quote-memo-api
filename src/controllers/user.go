@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 
+	"firebase.google.com/go/v4/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/shuheishintani/quote-memo-api/src/models"
 )
@@ -51,6 +52,7 @@ func (ctl *Controller) GetUsers(c *gin.Context) {
 }
 
 func (ctl *Controller) DeleteUser(c *gin.Context) {
+	auth := c.MustGet("auth").(*auth.Client)
 	uid := c.GetString("uid")
 	_, err := ctl.service.GetUserById(uid)
 	if err != nil {
@@ -61,6 +63,9 @@ func (ctl *Controller) DeleteUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+	if err := auth.DeleteUser(c, uid); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 	c.JSON(http.StatusOK, result)
 }
