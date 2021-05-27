@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/shuheishintani/quote-memo-api/src/models"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -181,10 +182,21 @@ func (service *Service) GetPrivateQuotesForExport(uid string) ([]QuoteForExport,
 }
 
 func (service *Service) GetFavoriteQuotes(uid string) ([]models.Quote, error) {
-	user, err := service.GetUserById(uid)
-	if err != nil {
-		return []models.Quote{}, err
+	user := models.User{}
+	if result := service.db.
+		Preload("FavoriteQuotes", func(db *gorm.DB) *gorm.DB {
+			return db.Offset(0).Limit(5)
+		}).
+		Preload("FavoriteQuotes.Tags").
+		Preload("FavoriteQuotes.Book").
+		Preload("FavoriteQuotes.User").
+		Preload("Quotes", "published IS true").
+		Preload("Quotes.Book").
+		Preload("Quotes.Tags").
+		First(&user, "id = ?", uid); result.Error != nil {
+		return []models.Quote{}, result.Error
 	}
+
 	return user.FavoriteQuotes, nil
 }
 

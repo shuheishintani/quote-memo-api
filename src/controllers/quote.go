@@ -56,6 +56,17 @@ func (ctl *Controller) GetPrivateQuotes(c *gin.Context) {
 	c.JSON(http.StatusOK, quotes)
 }
 
+func (ctl *Controller) GetPrivateQuoteById(c *gin.Context) {
+	id := c.Param("id")
+
+	quote, err := ctl.service.GetQuoteById(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, quote)
+}
+
 func (ctl *Controller) GetFavoriteQuotes(c *gin.Context) {
 	uid := c.GetString("uid")
 

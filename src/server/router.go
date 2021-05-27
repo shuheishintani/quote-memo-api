@@ -41,6 +41,7 @@ func SetRouter(db *gorm.DB, auth *auth.Client) *gin.Engine {
 	api.POST("/quotes", middleware.AuthMiddleware(), controller.PostQuote)
 	api.GET("/quotes", controller.GetPublicQuotes)
 	api.GET("/quotes/me", middleware.AuthMiddleware(), controller.GetPrivateQuotes)
+	api.GET("quotes/:id", middleware.AuthMiddleware(), controller.GetPrivateQuoteById)
 	api.GET("/quotes/my_favorite", middleware.AuthMiddleware(), controller.GetFavoriteQuotes)
 	api.GET("/quotes/for_export", middleware.AuthMiddleware(), controller.GetPrivateQuotesForExport)
 	api.PUT("/quotes/:id", middleware.AuthMiddleware(), controller.UpdateQuote)
