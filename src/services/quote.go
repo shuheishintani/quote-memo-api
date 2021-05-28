@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/shuheishintani/quote-memo-api/src/models"
@@ -175,8 +174,6 @@ func (service *Service) GetPrivateQuotesForExport(uid string) ([]QuoteForExport,
 			Tags: tagsForExport,
 		})
 	}
-
-	fmt.Printf("%+v", quotesForExport)
 
 	return quotesForExport, nil
 }
