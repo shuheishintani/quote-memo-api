@@ -227,7 +227,6 @@ func (service *Service) UpdateQuote(updateQuoteInput models.Quote, id string) (m
 		if result := service.db.Where(tag).FirstOrCreate(&tag); result.Error != nil {
 			return models.Quote{}, result.Error
 		}
-
 		if err := service.db.Model(&models.Quote{ID: i}).Association("Tags").Append(&tag); err != nil {
 			return models.Quote{}, err
 		}
