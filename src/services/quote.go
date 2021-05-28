@@ -181,11 +181,11 @@ func (service *Service) GetPrivateQuotesForExport(uid string) ([]QuoteForExport,
 	return quotesForExport, nil
 }
 
-func (service *Service) GetFavoriteQuotes(uid string) ([]models.Quote, error) {
+func (service *Service) GetFavoriteQuotes(uid string, offset int, limit int) ([]models.Quote, error) {
 	user := models.User{}
 	if result := service.db.
 		Preload("FavoriteQuotes", func(db *gorm.DB) *gorm.DB {
-			return db.Offset(0).Limit(5)
+			return db.Offset(offset).Limit(limit)
 		}).
 		Preload("FavoriteQuotes.Tags").
 		Preload("FavoriteQuotes.Book").

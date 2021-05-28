@@ -303,7 +303,7 @@ func TestGetFavoriteQuotes(t *testing.T) {
 	db.Model(&user2).Association("FavoriteQuotes").Append(&quotes[0])
 	db.Model(&user2).Association("FavoriteQuotes").Append(&quotes[1])
 
-	result, err := s.GetFavoriteQuotes(user2.ID)
+	result, err := s.GetFavoriteQuotes(user2.ID, 0, 10)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, result)

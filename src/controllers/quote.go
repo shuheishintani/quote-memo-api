@@ -70,7 +70,14 @@ func (ctl *Controller) GetPrivateQuoteById(c *gin.Context) {
 func (ctl *Controller) GetFavoriteQuotes(c *gin.Context) {
 	uid := c.GetString("uid")
 
-	quotes, err := ctl.service.GetFavoriteQuotes(uid)
+	page := c.Query("page")
+	i, err := strconv.Atoi(page)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	quotes, err := ctl.service.GetFavoriteQuotes(uid, 10*(i-1), 10)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
