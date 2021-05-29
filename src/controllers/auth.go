@@ -29,7 +29,8 @@ func (ctl *Controller) Login(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("session", cookie, int(expiresIn.Seconds()), "/", "", false, true)
+	c.SetCookie("session", cookie, int(expiresIn.Seconds()), "/", "", true, true)
+	c.SetSameSite(http.SameSiteNoneMode)
 	c.JSON(http.StatusOK, gin.H{"status": "success"})
 }
 

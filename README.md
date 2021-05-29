@@ -7,10 +7,6 @@ QuoteMemoは書籍の引用を管理・シェアできるWebサービスです�
 ## デモページ
 [https://quote-memo-client.vercel.app](https://quote-memo-client.vercel.app)
 
-※サーバー停止中
-
-
-
 ## 使用技術
 
 バックエンド
@@ -126,4 +122,9 @@ QuoteMemoは書籍の引用を管理・シェアできるWebサービスです�
 - フォローしているユーザーが追加した引用をタイムラインに表示する機能
 - 人気のタグや書籍を表示する機能
 - 引用にコメントを追加できる機能
+
+## ローカル環境での起動方法
+- ルートディレクトリに`.env`ファイルを作成する。
+  - `RAKUTEN_APP_ID`, `RAKUTEN_BOOK_API_URL`, `CLIENT_ORIGIN`を指定する。
+- `docker-compose up`でlocalhost:8080でサーバーが起動する。
 
