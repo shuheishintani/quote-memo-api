@@ -182,3 +182,46 @@ func TestDeleteUser(t *testing.T) {
 	db.Migrator().DropTable("tags")
 	db.Migrator().DropTable("users")
 }
+
+func TestGetUserBooks(t *testing.T) {
+	db, err := GormConnectForTesting()
+	if err != nil {
+		log.Fatal("Failed to connect gorm database: ", err)
+	}
+
+	postgresDB, err := db.DB()
+	if err != nil {
+		log.Fatal("Failed to connect database: ", err)
+	}
+	defer postgresDB.Close()
+
+	s := services.NewService(db)
+
+	book1 := util.RandomBook()
+	book2 := util.RandomBook()
+	book3 := util.RandomBook()
+	books := []models.Book{
+		book1, book2, book3,
+	}
+	db.Create(&books)
+
+	user := util.RandomUser()
+	user.Books = books
+	db.Create(&user)
+
+	result, err := s.GetUserBooks(user.ID)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, len(books), len(result))
+	assert.Equal(t, books[0].Title, result[0].Title)
+	assert.Equal(t, books[0].ISBN, result[0].ISBN)
+	assert.Equal(t, books[0].Author, result[0].Author)
+	assert.Equal(t, books[0].Publisher, result[0].Publisher)
+
+	db.Migrator().DropTable("quotes_tags")
+	db.Migrator().DropTable("users_quotes")
+	db.Migrator().DropTable("quotes")
+	db.Migrator().DropTable("books")
+	db.Migrator().DropTable("tags")
+	db.Migrator().DropTable("users")
+}

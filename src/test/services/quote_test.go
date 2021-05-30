@@ -382,6 +382,61 @@ func TestGetQuoteById(t *testing.T) {
 	db.Migrator().DropTable("users")
 }
 
+func TestGetPrivateQuotesForExport(t *testing.T) {
+	db, err := GormConnectForTesting()
+	if err != nil {
+		log.Fatal("Failed to connect gorm database: ", err)
+	}
+
+	postgresDB, err := db.DB()
+	if err != nil {
+		log.Fatal("Failed to connect database: ", err)
+	}
+	defer postgresDB.Close()
+
+	s := services.NewService(db)
+
+	user := util.RandomUser()
+	db.Create(&user)
+
+	tag1 := util.RandomTag()
+	tag2 := util.RandomTag()
+	tags := []models.Tag{
+		tag1, tag2,
+	}
+	db.Create(&tags)
+
+	book := util.RandomBook()
+	db.Create(&book)
+
+	quote1 := util.IncompleteRandomQuote(user.ID, false, book, tags)
+	quote2 := util.RandomQuote(user.ID, true)
+	quote3 := util.RandomQuote(user.ID, true)
+	quote4 := util.RandomQuote(user.ID, false)
+	quotes := []models.Quote{
+		quote1, quote2, quote3, quote4,
+	}
+	db.Create(&quotes)
+
+	result, err := s.GetPrivateQuotesForExport(user.ID)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, len(quotes), len(result))
+	assert.Equal(t, quotes[0].ID, result[0].ID)
+	assert.Equal(t, quotes[0].Page, result[0].Page)
+	assert.Equal(t, quotes[0].Text, result[0].Text)
+	assert.Equal(t, quotes[0].Book.Title, result[0].Book.Title)
+	assert.Equal(t, quotes[0].Tags[0].Name, result[0].Tags[0])
+	assert.Equal(t, quotes[0].Tags[1].Name, result[0].Tags[1])
+
+	db.Migrator().DropTable("quotes_tags")
+	db.Migrator().DropTable("users_quotes")
+	db.Migrator().DropTable("quotes")
+	db.Migrator().DropTable("books")
+	db.Migrator().DropTable("tags")
+	db.Migrator().DropTable("users")
+}
+
 func TestUpdateQuote(t *testing.T) {
 	db, err := GormConnectForTesting()
 	if err != nil {
