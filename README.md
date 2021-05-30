@@ -7,6 +7,10 @@ QuoteMemoは書籍の引用を管理・シェアできるWebサービスです�
 ## デモページ
 [https://quote-memo-client.vercel.app](https://quote-memo-client.vercel.app)
 
+## リポジトリ
+フロントエンド: [https://github.com/shuheishintani/quote-memo-client](https://github.com/shuheishintani/quote-memo-client)
+バックエンド: [https://github.com/shuheishintani/quote-memo-api](https://github.com/shuheishintani/quote-memo-api)
+
 ## 使用技術
 
 バックエンド
@@ -48,6 +52,7 @@ QuoteMemoは書籍の引用を管理・シェアできるWebサービスです�
 - Twitterログイン
 - 外部APIを利用した書籍検索
 - 引用の作成・更新・削除
+- 追加履歴のある書籍を候補として表示する機能
 - 公開設定
 - タグ付け
 - 複数のタグを指定して検索する機能
@@ -79,7 +84,7 @@ QuoteMemoは書籍の引用を管理・シェアできるWebサービスです�
 - ReactとNext.jsで構築しました。言語はTypeScriptを使用しています。
 - CSSフレームワークは、他と比較して意見性の弱いChakraUIを採用しました。
 - 全体的なデザインは[zenn.dev](https://zenn.dev/)を参考にしました。
-- 他のユーザーや書籍と紐づけられた引用を表示するページは、即座に変更を反映する必要がないため、SSGを利用してビルド時にデータを取得しています。
+- 他のユーザーや書籍と紐づけられた引用を表示するページは、即座に変更を反映する必要がないため、ISRを利用してレンダリング速度を向上させました。
 - ビューとロジックの分離を意識し、ビジネスロジックをカスタムフックにカプセル化しました。
 - `axios`のインターセプターを利用してXHRを行う際の共通処理を一箇所にまとめました。
 - フォームには`react-hook-form`、バリデーションには`yup`を採用し、バリデーションエラーは内容に応じてエラーメッセージを変更するようにしました。
@@ -102,7 +107,7 @@ QuoteMemoは書籍の引用を管理・シェアできるWebサービスです�
 
 #### インフラ
 - APIサーバはApp Engineにデプロイし、Cloud SQLと接続しています。
-- フロントのサーバはVercelにデプロイしました。
+- フロントサーバはVercelにデプロイしました。
 
 ## 課題
 
@@ -119,12 +124,6 @@ QuoteMemoは書籍の引用を管理・シェアできるWebサービスです�
 
 ## 今後追加したい機能
 - ユーザー同士のフォロー機能
-- フォローしているユーザーが追加した引用をタイムラインに表示する機能
+- フォローしているユーザーが追加した引用を表示する機能
 - 人気のタグや書籍を表示する機能
 - 引用にコメントを追加できる機能
-
-## ローカル環境での起動方法
-- ルートディレクトリに`.env`ファイルを作成する。
-  - `RAKUTEN_APP_ID`, `RAKUTEN_BOOK_API_URL`, `CLIENT_ORIGIN`を指定する。
-- `docker-compose up`でlocalhost:8080でサーバーが起動する。
-
