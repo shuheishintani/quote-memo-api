@@ -11,4 +11,5 @@ type User struct {
 	Provider        string    `json:"provider"`
 	Quotes          []Quote   `json:"quotes"`
 	FavoriteQuotes  []Quote   `gorm:"many2many:users_quotes;" json:"favorite_quotes"`
+	Books           []Book    `gorm:"many2many:users_books;" json:"books"`
 }

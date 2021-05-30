@@ -41,6 +41,13 @@ func (service *Service) PostQuote(postQuoteInput models.Quote, uid string) (mode
 		}
 	}
 
+	if result := service.db.Where(book).FirstOrCreate(&book); result.Error != nil {
+		return models.Quote{}, result.Error
+	}
+	if err := service.db.Model(&models.User{ID: uid}).Association("Books").Append(&book); err != nil {
+		return models.Quote{}, err
+	}
+
 	return quote, nil
 }
 

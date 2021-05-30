@@ -33,6 +33,16 @@ func (service *Service) GetUserById(uid string) (models.User, error) {
 	return user, nil
 }
 
+func (service *Service) GetUserBooks(uid string) ([]models.Book, error) {
+	user := models.User{}
+	if result := service.db.
+		Preload("Books").
+		First(&user, "id = ?", uid); result.Error != nil {
+		return []models.Book{}, result.Error
+	}
+	return user.Books, nil
+}
+
 func (service *Service) GetUsers() ([]models.User, error) {
 	users := []models.User{}
 	if result := service.db.Find(&users); result.Error != nil {
